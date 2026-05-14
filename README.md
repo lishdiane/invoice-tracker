@@ -4,3 +4,4 @@
 - Diane Lish
 - Steve Buamikusu KALALA
 - Madison Thomas
+- Grace Ayuso
