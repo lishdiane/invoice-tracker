@@ -2,3 +2,4 @@ bin/
 obj/
 .vscode
 invoice-tracker.sln
+appsettings.Development.json
