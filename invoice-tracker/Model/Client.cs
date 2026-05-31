@@ -14,6 +14,7 @@ namespace InvoiceTracker
     public string? ClientAddress { get; set; }
     public string? ClientCity { get; set; }
     public string? ClientState { get; set; }
+    public bool IsArchived { get; set; }
     public int UserId { get; set; }
     public User User { get; set; } = null!;
     public ICollection<Invoice> Invoices { get; } = new List<Invoice>();
