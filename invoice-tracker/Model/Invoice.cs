@@ -9,6 +9,7 @@ namespace InvoiceTracker
     public DateTime InvoiceDate { get; set; } = DateTime.Now;
     [DataType(DataType.Date)]
     public DateTime DueDate { get; set; }
+    public bool IsPaid { get; set; }
     public int UserId { get; set; }
     public User User { get; set; } = null!;
     public int ClientId { get; set; }
