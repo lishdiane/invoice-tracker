@@ -1,6 +1,7 @@
 using invoice_tracker.Components;
 using Microsoft.EntityFrameworkCore;
 using InvoiceTracker;
+using InvoiceTracker.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,5 +30,11 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    SeedData.Initialize(services);
+}
 
 app.Run();
