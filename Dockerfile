@@ -4,10 +4,10 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["invoice-tracker/invoice-tracker/invoice-tracker.csproj", "invoice-tracker/invoice-tracker/"]
-RUN dotnet restore "invoice-tracker/invoice-tracker/invoice-tracker.csproj"
+COPY ["invoice-tracker/invoice-tracker.csproj", "invoice-tracker/"]
+RUN dotnet restore "invoice-tracker/invoice-tracker.csproj"
 COPY . .
-WORKDIR "/src/invoice-tracker/invoice-tracker"
+WORKDIR "/src/invoice-tracker"
 RUN dotnet build "invoice-tracker.csproj" -c Release -o /app/build
 
 FROM build AS publish
