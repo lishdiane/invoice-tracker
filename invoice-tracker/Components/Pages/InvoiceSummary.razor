@@ -1,0 +1,68 @@
+@page "/invoice-summary"
+
+@using Microsoft.EntityFrameworkCore
+
+@inject InvoiceTrackerContext Context
+
+<h3>Invoice Summary</h3>
+
+<div class="row">
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+
+                <h5>Total Invoices</h5>
+
+                <h2>@totalInvoices</h2>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+
+                <h5>Paid</h5>
+
+                <h2>@paidInvoices</h2>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+
+                <h5>Unpaid</h5>
+
+                <h2>@unpaidInvoices</h2>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    int totalInvoices;
+    int paidInvoices;
+    int unpaidInvoices;
+
+    protected override async Task OnInitializedAsync()
+    {
+        totalInvoices =
+            await Context.Invoices.CountAsync();
+
+        paidInvoices =
+            await Context.Invoices
+                .CountAsync(i => i.IsPaid);
+
+        unpaidInvoices =
+            await Context.Invoices
+                .CountAsync(i => !i.IsPaid);
+    }
+}

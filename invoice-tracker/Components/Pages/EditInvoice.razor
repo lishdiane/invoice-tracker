@@ -1,0 +1,110 @@
+@page "/invoices/edit/{id:int}"
+@rendermode InteractiveServer
+
+@using Microsoft.EntityFrameworkCore
+
+@inject InvoiceTrackerContext Context
+@inject NavigationManager Navigation
+
+<ErrorBoundary>
+    <ChildContent>
+
+        <h3>Edit Invoice</h3>
+
+        @if (invoice?.Client != null)
+        {
+            <div class="mb-3">
+                <label>Client</label>
+                <input class="form-control" value="@invoice.Client.ClientName" disabled />
+            </div>
+        }
+
+        @if (invoice != null)
+        {
+            <EditForm Model="invoice" OnValidSubmit="UpdateInvoice">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label>Due Date</label>
+                    <InputDate class="form-control"
+                               @bind-Value="invoice.DueDate" />
+                </div>
+
+                <div class="mb-3">
+                    <label>Status</label>
+                    <InputCheckbox @bind-Value="invoice.IsPaid" />
+                    Paid
+                </div>
+
+                <button class="btn btn-success">
+                    Update
+                </button>
+
+                <button type="button" class="btn btn-secondary ms-2" @onclick="Cancel">
+                    Cancel
+                </button>
+            </EditForm>
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+
+    </ChildContent>
+
+    <ErrorContent Context="ex">
+        <div class="alert alert-danger">
+            <strong>Error:</strong> @ex.Message
+        </div>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    Invoice? invoice;
+
+    protected override async Task OnInitializedAsync()
+    {
+        invoice = await Context.Invoices
+            .Include(i => i.Client)
+            .Include(i => i.InvoiceProducts)
+            .FirstOrDefaultAsync(i => i.InvoiceId == id);
+    }
+
+    async Task UpdateInvoice()
+    {
+        try
+        {
+            var dbInvoice = await Context.Invoices
+                .FirstOrDefaultAsync(i => i.InvoiceId == id);
+
+            if (dbInvoice == null)
+                return;
+            dbInvoice.DueDate = DateTime.SpecifyKind(invoice!.DueDate, DateTimeKind.Utc);
+            dbInvoice.IsPaid = invoice.IsPaid;
+
+            // DO NOT TOUCH:
+            // dbInvoice.ClientId
+            // dbInvoice.UserId
+            // dbInvoice.InvoiceProducts
+
+            await Context.SaveChangesAsync();
+
+            Navigation.NavigateTo("/invoices");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            Console.WriteLine(ex.InnerException?.Message);
+            throw;
+        }
+    }
+
+    void Cancel()
+    {
+        Navigation.NavigateTo("/invoices");
+    }
+}
