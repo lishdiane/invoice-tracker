@@ -1,4 +1,4 @@
-using invoice_tracker.Components;
+using InvoiceTracker.Components;
 using Microsoft.EntityFrameworkCore;
 using InvoiceTracker;
 using InvoiceTracker.Data;
