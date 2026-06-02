@@ -1,8 +1,10 @@
 @page "/signup"
 
+@using System.Globalization;
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.EntityFrameworkCore;
 @using InvoiceTracker
+@rendermode InteractiveServer
 @inject InvoiceTrackerContext Db
 @inject NavigationManager Navigation
 
@@ -10,9 +12,8 @@
 
 <h1>Create Account</h1>
 
-<EditForm Model="@registerUser" OnValidSubmit="HandleSignUp" FormName="SignUpForm" method="post">
+<EditForm EditContext="editContext" OnValidSubmit="HandleSignUp" FormName="SignUpForm">
   <DataAnnotationsValidator />
-  <ValidationSummary />
 
   @if (!string.IsNullOrEmpty(errorMessage))
   {
@@ -25,17 +26,32 @@
     <legend>Account Information</legend>
     <div class="form-group">
       <label for="username">Username</label>
-      <InputText id="username" class="form-control" @bind-Value="registerUser.Username" />
+      <InputText 
+        id="username" 
+        class="@GetFieldCssClass(nameof(registerUser.Username))" 
+        @bind-Value="registerUser.Username" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.Username)))" />
       <ValidationMessage For="@(() => registerUser.Username)" />
     </div>
     <div class="form-group">
       <label for="password">Password</label>
-      <InputText id="password" type="password" class="form-control" @bind-Value="registerUser.Password" />
+      <InputText 
+        id="password" 
+        type="password" 
+        class="@GetFieldCssClass(nameof(registerUser.Password))" 
+        @bind-Value="registerUser.Password" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.Password)))" />
       <ValidationMessage For="@(() => registerUser.Password)" />
     </div>
     <div class="form-group">
       <label for="confirmPassword">Confirm Password</label>
-      <InputText id="confirmPassword" type="password" class="form-control" @bind-Value="registerUser.ConfirmPassword" />
+      <InputText 
+        id="confirmPassword" 
+        type="password" 
+        class="@GetFieldCssClass(nameof(registerUser.ConfirmPassword))" 
+        @bind-Value="registerUser.ConfirmPassword"
+        @onblur="@(_ => ValidateField(nameof(registerUser.ConfirmPassword)))" />
+      <ValidationMessage For="@(() => registerUser.ConfirmPassword)" />
     </div>
   </fieldset>
 
@@ -43,18 +59,30 @@
     <legend>Company Information</legend>
     <div class="form-group">
       <label for="companyName">Company Name</label>
-      <InputText id="companyName" class="form-control" @bind-Value="registerUser.CompanyName" />
+      <InputText 
+        id="companyName" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyName))" 
+        @bind-Value="registerUser.CompanyName" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyName)))" />
       <ValidationMessage For="@(() => registerUser.CompanyName)" />
     </div>
     <div class="form-group">
       <label for="companyEmail">Company Email</label>
-      <InputText id="companyEmail" class="form-control" @bind-Value="registerUser.CompanyEmail" />
+      <InputText 
+        id="companyEmail" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyEmail))" 
+        @bind-Value="registerUser.CompanyEmail" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyEmail)))" />
       <ValidationMessage For="@(() => registerUser.CompanyEmail)" />
     </div>
 
     <div class="form-group">
       <label for="companyPhone">Company Phone</label>
-      <InputText id="companyPhone" class="form-control" @bind-Value="registerUser.CompanyPhone" />
+      <InputText 
+        id="companyPhone" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyPhone))" 
+        @bind-Value="registerUser.CompanyPhone" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyPhone)))" />
       <ValidationMessage For="@(() => registerUser.CompanyPhone)" />
     </div>
   </fieldset>
@@ -64,31 +92,47 @@
 
     <div class="form-group">
       <label for="companyAddress">Street Address</label>
-      <InputText id="companyAddress" class="form-control" @bind-Value="registerUser.CompanyAddress" />
+      <InputText 
+        id="companyAddress" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyAddress))" 
+        @bind-Value="registerUser.CompanyAddress" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyAddress)))" />
       <ValidationMessage For="@(() => registerUser.CompanyAddress)" />
     </div>
 
     <div class="form-group">
       <label for="companyCity">City</label>
-      <InputText id="companyCity" class="form-control" @bind-Value="registerUser.CompanyCity" />
+      <InputText 
+        id="companyCity" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyCity))" 
+        @bind-Value="registerUser.CompanyCity" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyCity)))" />
       <ValidationMessage For="@(() => registerUser.CompanyCity)" />
     </div>
 
     <div class="form-group">
       <label for="companyState">State</label>
-      <InputText id="companyState" class="form-control" @bind-Value="registerUser.CompanyState" />
+      <InputText 
+        id="companyState" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyState))" 
+        @bind-Value="registerUser.CompanyState" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyState)))" />
       <ValidationMessage For="@(() => registerUser.CompanyState)" />
     </div>
   </fieldset>
 
-  <button type="submit" class="btn btn-primary" disabled="@isError">
+  <button 
+    type="submit" 
+    class="btn btn-primary" 
+    disabled="@(!isFormValid)">
     Create Account
   </button>
+  <ValidationSummary />
 </EditForm>
 
 @code {
 
-  private bool isError = false;
+  private bool isFormValid;
   private RegisterUser registerUser = new();
   private EditContext editContext;
   private readonly PasswordHasher<User> _passwordHasher = new();
@@ -97,14 +141,47 @@
   protected override void OnInitialized()
   {
     editContext = new EditContext(registerUser);
-    editContext.OnFieldChanged += (_, __) => ValidateForm();
-    registerUser.Password = "";
-    registerUser.ConfirmPassword = "";
+
+    editContext.OnValidationStateChanged += HandleValidationStateChanged;
+
+    isFormValid = false;
   }
-  protected void ShowError() => isError = true;
+
+  private void ValidateForm()
+  {
+    isFormValid = editContext.Validate();
+
+    StateHasChanged();
+  }
+
+  private void ValidateField(string fieldName)
+  {
+    editContext.NotifyFieldChanged(
+      new FieldIdentifier(registerUser, fieldName));
+
+    StateHasChanged();
+  }
+
+  protected void ShowError() => isFormValid = false;
+
+  private void HandleValidationStateChanged(
+      object? sender,
+      ValidationStateChangedEventArgs e)
+  {
+    isFormValid = !editContext.GetValidationMessages().Any();
+
+    StateHasChanged();
+  }
+
   private async Task HandleSignUp()
   {
+    Console.WriteLine("Signing Up");
     errorMessage = "";
+
+    Console.WriteLine($"Username: {registerUser.Username}");
+    Console.WriteLine($"Company: {registerUser.CompanyName}");
+    Console.WriteLine($"Email: {registerUser.CompanyEmail}");
+    Console.WriteLine($"Password: {registerUser.Password}");
 
     var existingUser = await Db.Users
         .FirstOrDefaultAsync(
@@ -115,6 +192,7 @@
       errorMessage = "Username already exists.";
       return;
     }
+
 
     var user = new User
     {
@@ -133,10 +211,39 @@
         user,
         registerUser.Password);
 
-    Db.Users.Add(user);
+    try
+    {
+      Db.Users.Add(user);
+      await Db.SaveChangesAsync();
 
-    await Db.SaveChangesAsync();
+      Navigation.NavigateTo("/");
+    }
+    catch (Exception ex)
+    {
+      errorMessage = $"Database Error: {ex.Message}";
+    }
+  }
 
-    Navigation.NavigateTo("/");
+  public void Dispose()
+  {
+    editContext.OnValidationStateChanged -= HandleValidationStateChanged;
+  }
+
+  private string GetFieldCssClass(string fieldName)
+  {
+    var field = new FieldIdentifier(registerUser, fieldName);
+
+    bool hasErrors =
+        editContext.GetValidationMessages(field).Any();
+
+    bool hasBeenModified =
+        editContext.IsModified(field);
+
+    if (!hasBeenModified)
+      return "form-control";
+
+    return hasErrors
+        ? "form-control is-invalid"
+        : "form-control is-valid";
   }
 }
