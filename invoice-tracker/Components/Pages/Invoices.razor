@@ -3,6 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject InvoiceTrackerContext Context
 @inject NavigationManager Navigation
+@inject UserSession UserSession
 
 <h3>Invoices</h3>
 
@@ -102,6 +103,13 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        // Redirect to login if not authenticated
+        if (!UserSession.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
         invoices = await Context.Invoices
             .Include(i => i.Client)
             .Include(i => i.InvoiceProducts)
