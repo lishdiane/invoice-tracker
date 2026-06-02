@@ -1,0 +1,153 @@
+@page "/invoices/view/{id:int}"
+@rendermode InteractiveServer
+
+@using Microsoft.EntityFrameworkCore
+@using System.Text
+
+@inject InvoiceTrackerContext Context
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<h3>Invoice Details</h3>
+
+@if (invoice == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+
+            <h5>Invoice #@invoice.InvoiceId</h5>
+
+            <p>
+                <strong>Client:</strong>
+                @invoice.Client?.ClientName
+            </p>
+
+            <p>
+                <strong>Invoice Date:</strong>
+                @invoice.InvoiceDate.ToShortDateString()
+            </p>
+
+            <p>
+                <strong>Due Date:</strong>
+                @invoice.DueDate.ToShortDateString()
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+                @(invoice.IsPaid ? "Paid" : "Unpaid")
+            </p>
+
+            <h5>Products</h5>
+
+            @if (invoice.InvoiceProducts != null &&
+      invoice.InvoiceProducts.Any())
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in invoice.InvoiceProducts)
+                        {
+                            <tr>
+                                <td>@item.ProductId</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Price.ToString("C")</td>
+                                <td>@((item.Quantity * item.Price).ToString("C"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <h5>
+                    Grand Total:
+                    @(invoice.InvoiceProducts.Sum(i => i.Quantity * i.Price).ToString("C"))
+                </h5>
+            }
+            else
+            {
+                <p>No products found.</p>
+            }
+
+            <button class="btn btn-primary me-2" @onclick="DownloadInvoice">
+                Download Invoice
+            </button>
+
+            <button class="btn btn-secondary" @onclick="BackToList">
+                Back
+            </button>
+
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    Invoice? invoice;
+
+    protected override async Task OnInitializedAsync()
+    {
+        invoice = await Context.Invoices
+            .Include(i => i.Client)
+            .Include(i => i.InvoiceProducts)
+            .FirstOrDefaultAsync(i => i.InvoiceId == id);
+    }
+
+    async Task DownloadInvoice()
+    {
+        if (invoice == null)
+            return;
+
+        var content = new StringBuilder();
+
+        content.AppendLine($"Invoice #{invoice.InvoiceId}");
+        content.AppendLine();
+        content.AppendLine($"Client: {invoice.Client?.ClientName}");
+        content.AppendLine($"Invoice Date: {invoice.InvoiceDate:d}");
+        content.AppendLine($"Due Date: {invoice.DueDate:d}");
+        content.AppendLine($"Status: {(invoice.IsPaid ? "Paid" : "Unpaid")}");
+        content.AppendLine();
+
+        content.AppendLine("Products");
+        content.AppendLine("----------------------------------");
+
+        foreach (var item in invoice.InvoiceProducts)
+        {
+            content.AppendLine(
+                $"Product {item.ProductId} | Qty: {item.Quantity} | Price: {item.Price:C}");
+        }
+
+        content.AppendLine();
+
+        decimal total =
+            invoice.InvoiceProducts.Sum(i => i.Quantity * i.Price);
+
+        content.AppendLine($"Grand Total: {total:C}");
+
+        var bytes = Encoding.UTF8.GetBytes(content.ToString());
+        var base64 = Convert.ToBase64String(bytes);
+
+        await JS.InvokeVoidAsync(
+            "downloadFile",
+            $"Invoice-{invoice.InvoiceId}.txt",
+            base64);
+    }
+
+    void BackToList()
+    {
+        Navigation.NavigateTo("/invoice-summary");
+    }
+}

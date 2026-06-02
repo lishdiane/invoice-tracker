@@ -18,6 +18,22 @@
     <Routes />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script>
+        window.downloadFile = (fileName, base64) => {
+
+        const link = document.createElement('a');
+
+        link.href = "data:text/plain;base64," + base64;
+
+        link.download = fileName;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
+        };
+    </script>
 </body>
 
 </html>
