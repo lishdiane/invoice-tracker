@@ -132,57 +132,46 @@
 
 @code {
 
-  private bool isFormValid;
+  private HashSet<string> validatedFields = new();
+  private bool isFormValid => 
+      editContext is not null && 
+      requiredFields.All(f => validatedFields.Contains(f)) &&
+      !editContext.GetValidationMessages().Any();
   private RegisterUser registerUser = new();
   private EditContext editContext;
   private readonly PasswordHasher<User> _passwordHasher = new();
   private string errorMessage = "";
+  private readonly string[] requiredFields =
+  [
+    nameof(registerUser.Username),
+    nameof(registerUser.Password),
+    nameof(registerUser.ConfirmPassword),
+    nameof(registerUser.CompanyName),
+    nameof(registerUser.CompanyEmail),
+    nameof(registerUser.CompanyAddress),
+    nameof(registerUser.CompanyCity),
+    nameof(registerUser.CompanyState),
+    nameof(registerUser.CompanyPhone)
+  ];
 
   protected override void OnInitialized()
   {
     editContext = new EditContext(registerUser);
-
-    editContext.OnValidationStateChanged += HandleValidationStateChanged;
-
-    isFormValid = false;
-  }
-
-  private void ValidateForm()
-  {
-    isFormValid = editContext.Validate();
-
-    StateHasChanged();
   }
 
   private void ValidateField(string fieldName)
   {
+    validatedFields.Add(fieldName);
+
     editContext.NotifyFieldChanged(
       new FieldIdentifier(registerUser, fieldName));
-
-    StateHasChanged();
-  }
-
-  protected void ShowError() => isFormValid = false;
-
-  private void HandleValidationStateChanged(
-      object? sender,
-      ValidationStateChangedEventArgs e)
-  {
-    isFormValid = !editContext.GetValidationMessages().Any();
-
-    StateHasChanged();
   }
 
   private async Task HandleSignUp()
   {
-    Console.WriteLine("Signing Up");
     errorMessage = "";
 
-    Console.WriteLine($"Username: {registerUser.Username}");
-    Console.WriteLine($"Company: {registerUser.CompanyName}");
-    Console.WriteLine($"Email: {registerUser.CompanyEmail}");
-    Console.WriteLine($"Password: {registerUser.Password}");
-
+    @* Code below requires DB connection *@
     var existingUser = await Db.Users
         .FirstOrDefaultAsync(
             u => u.Username == registerUser.Username);
@@ -193,26 +182,35 @@
       return;
     }
 
-
-    var user = new User
-    {
-      Username = registerUser.Username,
-      Password = string.Empty, // not yet hashed
-      CompanyName = registerUser.CompanyName,
-      CompanyEmail = registerUser.CompanyEmail,
-      CompanyAddress = registerUser.CompanyAddress,
-      CompanyCity = registerUser.CompanyCity,
-      CompanyState = registerUser.CompanyState,
-      CompanyPhone = registerUser.CompanyPhone
-    };
-
-    user.Password =
-      _passwordHasher.HashPassword(
-        user,
-        registerUser.Password);
-
     try
     {
+
+      var user = new User
+      {
+        Username = registerUser.Username,
+        Password = string.Empty, // not yet hashed
+        CompanyName = registerUser.CompanyName,
+        CompanyEmail = registerUser.CompanyEmail,
+        CompanyAddress = registerUser.CompanyAddress,
+        CompanyCity = registerUser.CompanyCity,
+        CompanyState = registerUser.CompanyState,
+        CompanyPhone = registerUser.CompanyPhone
+      };
+
+      user.Password =
+        _passwordHasher.HashPassword(
+          user,
+          registerUser.Password);
+
+      @* Local Testing only *@
+      @* Console.WriteLine("=== NEW USER ===");
+      Console.WriteLine($"Username: {user.Username}");
+      Console.WriteLine($"Company: {user.CompanyName}");
+      Console.WriteLine($"Email: {user.CompanyEmail}");
+      Console.WriteLine($"Password Hash: {user.Password}");
+      errorMessage = "Form submitted successfully!"; *@
+
+      @* Code below requires DB connection *@
       Db.Users.Add(user);
       await Db.SaveChangesAsync();
 
@@ -224,10 +222,6 @@
     }
   }
 
-  public void Dispose()
-  {
-    editContext.OnValidationStateChanged -= HandleValidationStateChanged;
-  }
 
   private string GetFieldCssClass(string fieldName)
   {
