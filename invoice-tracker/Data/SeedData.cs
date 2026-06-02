@@ -5,43 +5,48 @@ namespace InvoiceTracker.Data
 {
   public static class SeedData
   {
-    public static void Initialize(IServiceProvider serviceProvider)
-    {
-      using var context = new InvoiceTrackerContext(
-          serviceProvider.GetRequiredService<DbContextOptions<InvoiceTrackerContext>>());
+        public static void Initialize(IServiceProvider serviceProvider)
+        {
+            using var context = new InvoiceTrackerContext(
+            serviceProvider.GetRequiredService<DbContextOptions<InvoiceTrackerContext>>());
 
-      if (context.Users.Any()) return;
-
-      var users = new List<User>
+            try
             {
-                new User
-                {
-                    Username = "jsmith",
-                    Password = "hashed_password_1",
-                    CompanyName = "Smith Consulting LLC",
-                    CompanyEmail = "info@smithconsulting.com",
-                    CompanyAddress = "123 Main Street",
-                    CompanyCity = "Pocatello",
-                    CompanyState = "ID",
-                    CompanyPhone = "2085550101"
-                },
-                new User
-                {
-                    Username = "mgarcia",
-                    Password = "hashed_password_2",
-                    CompanyName = "Garcia Design Co",
-                    CompanyEmail = "hello@garciadesign.com",
-                    CompanyAddress = "456 Oak Avenue",
-                    CompanyCity = "Boise",
-                    CompanyState = "ID",
-                    CompanyPhone = "2085550202"
-                }
-            };
+                context.Database.OpenConnection();
 
-      context.Users.AddRange(users);
-      context.SaveChanges();
+                if (context.Users.Any())
+                    return;
 
-      var clients = new List<Client>
+                var users = new List<User>
+        {
+            new User
+            {
+                Username = "jsmith",
+                Password = "hashed_password_1",
+                CompanyName = "Smith Consulting LLC",
+                CompanyEmail = "info@smithconsulting.com",
+                CompanyAddress = "123 Main Street",
+                CompanyCity = "Pocatello",
+                CompanyState = "ID",
+                CompanyPhone = "2085550101"
+            },
+            new User
+            {
+                Username = "mgarcia",
+                Password = "hashed_password_2",
+                CompanyName = "Garcia Design Co",
+                CompanyEmail = "hello@garciadesign.com",
+                CompanyAddress = "456 Oak Avenue",
+                CompanyCity = "Boise",
+                CompanyState = "ID",
+                CompanyPhone = "2085550202"
+            }
+        };
+
+                context.Users.AddRange(users);
+                context.SaveChanges();
+
+                var clients = new List<Client>
             {
                 new Client
                 {
@@ -83,10 +88,10 @@ namespace InvoiceTracker.Data
                 }
             };
 
-      context.Clients.AddRange(clients);
-      context.SaveChanges();
+                context.Clients.AddRange(clients);
+                context.SaveChanges();
 
-      var products = new List<Product>
+                var products = new List<Product>
             {
                 new Product { ProductName = "Web Consulting", ProductPrice = 150.00m, UserId = users[0].UserId },
                 new Product { ProductName = "SEO Audit", ProductPrice = 500.00m, UserId = users[0].UserId },
@@ -96,10 +101,10 @@ namespace InvoiceTracker.Data
                 new Product { ProductName = "Social Media Kit", ProductPrice = 600.00m, UserId = users[1].UserId }
             };
 
-      context.Products.AddRange(products);
-      context.SaveChanges();
+                context.Products.AddRange(products);
+                context.SaveChanges();
 
-      var invoices = new List<Invoice>
+                var invoices = new List<Invoice>
 {
     new Invoice
     {
@@ -143,10 +148,10 @@ namespace InvoiceTracker.Data
     }
 };
 
-      context.Invoices.AddRange(invoices);
-      context.SaveChanges();
+                context.Invoices.AddRange(invoices);
+                context.SaveChanges();
 
-      var invoiceProducts = new List<InvoiceProduct>
+                var invoiceProducts = new List<InvoiceProduct>
             {
                 new InvoiceProduct { InvoiceId = invoices[0].InvoiceId, ProductId = products[0].ProductId, Quantity = 10, Price = 150.00m },
                 new InvoiceProduct { InvoiceId = invoices[0].InvoiceId, ProductId = products[1].ProductId, Quantity = 1, Price = 500.00m },
@@ -157,8 +162,13 @@ namespace InvoiceTracker.Data
                 new InvoiceProduct { InvoiceId = invoices[4].InvoiceId, ProductId = products[4].ProductId, Quantity = 1, Price = 2500.00m }
             };
 
-      context.InvoiceProducts.AddRange(invoiceProducts);
-      context.SaveChanges();
+                context.InvoiceProducts.AddRange(invoiceProducts);
+                context.SaveChanges();
+            }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred seeding the DB. {ex.Message}");
+        }
     }
   }
 }
