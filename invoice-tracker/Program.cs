@@ -9,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+//User Session (singleton to maintain state across the app, change to other lifetime if you want to manage it differently)
+builder.Services.AddSingleton<UserSession>();
+
 //Db Connection
 builder.Services.AddDbContext<InvoiceTrackerContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
