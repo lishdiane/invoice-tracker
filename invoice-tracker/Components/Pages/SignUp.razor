@@ -1,0 +1,243 @@
+@page "/signup"
+
+@using System.Globalization;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.EntityFrameworkCore;
+@using InvoiceTracker
+@rendermode InteractiveServer
+@inject InvoiceTrackerContext Db
+@inject NavigationManager Navigation
+
+<PageTitle>Create Account</PageTitle>
+
+<h1>Create Account</h1>
+
+<EditForm EditContext="editContext" OnValidSubmit="HandleSignUp" FormName="SignUpForm">
+  <DataAnnotationsValidator />
+
+  @if (!string.IsNullOrEmpty(errorMessage))
+  {
+    <div class="alert alert-danger">
+      @errorMessage
+    </div>
+  }
+
+  <fieldset>
+    <legend>Account Information</legend>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <InputText 
+        id="username" 
+        class="@GetFieldCssClass(nameof(registerUser.Username))" 
+        @bind-Value="registerUser.Username" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.Username)))" />
+      <ValidationMessage For="@(() => registerUser.Username)" />
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <InputText 
+        id="password" 
+        type="password" 
+        class="@GetFieldCssClass(nameof(registerUser.Password))" 
+        @bind-Value="registerUser.Password" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.Password)))" />
+      <ValidationMessage For="@(() => registerUser.Password)" />
+    </div>
+    <div class="form-group">
+      <label for="confirmPassword">Confirm Password</label>
+      <InputText 
+        id="confirmPassword" 
+        type="password" 
+        class="@GetFieldCssClass(nameof(registerUser.ConfirmPassword))" 
+        @bind-Value="registerUser.ConfirmPassword"
+        @onblur="@(_ => ValidateField(nameof(registerUser.ConfirmPassword)))" />
+      <ValidationMessage For="@(() => registerUser.ConfirmPassword)" />
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Company Information</legend>
+    <div class="form-group">
+      <label for="companyName">Company Name</label>
+      <InputText 
+        id="companyName" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyName))" 
+        @bind-Value="registerUser.CompanyName" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyName)))" />
+      <ValidationMessage For="@(() => registerUser.CompanyName)" />
+    </div>
+    <div class="form-group">
+      <label for="companyEmail">Company Email</label>
+      <InputText 
+        id="companyEmail" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyEmail))" 
+        @bind-Value="registerUser.CompanyEmail" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyEmail)))" />
+      <ValidationMessage For="@(() => registerUser.CompanyEmail)" />
+    </div>
+
+    <div class="form-group">
+      <label for="companyPhone">Company Phone</label>
+      <InputText 
+        id="companyPhone" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyPhone))" 
+        @bind-Value="registerUser.CompanyPhone" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyPhone)))" />
+      <ValidationMessage For="@(() => registerUser.CompanyPhone)" />
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Company Address</legend>
+
+    <div class="form-group">
+      <label for="companyAddress">Street Address</label>
+      <InputText 
+        id="companyAddress" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyAddress))" 
+        @bind-Value="registerUser.CompanyAddress" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyAddress)))" />
+      <ValidationMessage For="@(() => registerUser.CompanyAddress)" />
+    </div>
+
+    <div class="form-group">
+      <label for="companyCity">City</label>
+      <InputText 
+        id="companyCity" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyCity))" 
+        @bind-Value="registerUser.CompanyCity" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyCity)))" />
+      <ValidationMessage For="@(() => registerUser.CompanyCity)" />
+    </div>
+
+    <div class="form-group">
+      <label for="companyState">State</label>
+      <InputText 
+        id="companyState" 
+        class="@GetFieldCssClass(nameof(registerUser.CompanyState))" 
+        @bind-Value="registerUser.CompanyState" 
+        @onblur="@(_ => ValidateField(nameof(registerUser.CompanyState)))" />
+      <ValidationMessage For="@(() => registerUser.CompanyState)" />
+    </div>
+  </fieldset>
+
+  <button 
+    type="submit" 
+    class="btn btn-primary" 
+    disabled="@(!isFormValid)">
+    Create Account
+  </button>
+  <ValidationSummary />
+</EditForm>
+
+@code {
+
+  private HashSet<string> validatedFields = new();
+  private bool isFormValid => 
+      editContext is not null && 
+      requiredFields.All(f => validatedFields.Contains(f)) &&
+      !editContext.GetValidationMessages().Any();
+  private RegisterUser registerUser = new();
+  private EditContext editContext;
+  private readonly PasswordHasher<User> _passwordHasher = new();
+  private string errorMessage = "";
+  private readonly string[] requiredFields =
+  [
+    nameof(registerUser.Username),
+    nameof(registerUser.Password),
+    nameof(registerUser.ConfirmPassword),
+    nameof(registerUser.CompanyName),
+    nameof(registerUser.CompanyEmail),
+    nameof(registerUser.CompanyAddress),
+    nameof(registerUser.CompanyCity),
+    nameof(registerUser.CompanyState),
+    nameof(registerUser.CompanyPhone)
+  ];
+
+  protected override void OnInitialized()
+  {
+    editContext = new EditContext(registerUser);
+  }
+
+  private void ValidateField(string fieldName)
+  {
+    validatedFields.Add(fieldName);
+
+    editContext.NotifyFieldChanged(
+      new FieldIdentifier(registerUser, fieldName));
+  }
+
+  private async Task HandleSignUp()
+  {
+    errorMessage = "";
+
+    @* Code below requires DB connection *@
+    var existingUser = await Db.Users
+        .FirstOrDefaultAsync(
+            u => u.Username == registerUser.Username);
+
+    if (existingUser != null)
+    {
+      errorMessage = "Username already exists.";
+      return;
+    }
+
+    try
+    {
+
+      var user = new User
+      {
+        Username = registerUser.Username,
+        Password = string.Empty, // not yet hashed
+        CompanyName = registerUser.CompanyName,
+        CompanyEmail = registerUser.CompanyEmail,
+        CompanyAddress = registerUser.CompanyAddress,
+        CompanyCity = registerUser.CompanyCity,
+        CompanyState = registerUser.CompanyState,
+        CompanyPhone = registerUser.CompanyPhone
+      };
+
+      user.Password =
+        _passwordHasher.HashPassword(
+          user,
+          registerUser.Password);
+
+      @* Local Testing only *@
+      @* Console.WriteLine("=== NEW USER ===");
+      Console.WriteLine($"Username: {user.Username}");
+      Console.WriteLine($"Company: {user.CompanyName}");
+      Console.WriteLine($"Email: {user.CompanyEmail}");
+      Console.WriteLine($"Password Hash: {user.Password}");
+      errorMessage = "Form submitted successfully!"; *@
+
+      @* Code below requires DB connection *@
+      Db.Users.Add(user);
+      await Db.SaveChangesAsync();
+
+      Navigation.NavigateTo("/");
+    }
+    catch (Exception ex)
+    {
+      errorMessage = $"Database Error: {ex.Message}";
+    }
+  }
+
+
+  private string GetFieldCssClass(string fieldName)
+  {
+    var field = new FieldIdentifier(registerUser, fieldName);
+
+    bool hasErrors =
+        editContext.GetValidationMessages(field).Any();
+
+    bool hasBeenModified =
+        editContext.IsModified(field);
+
+    if (!hasBeenModified)
+      return "form-control";
+
+    return hasErrors
+        ? "form-control is-invalid"
+        : "form-control is-valid";
+  }
+}
