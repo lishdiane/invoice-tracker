@@ -3,6 +3,8 @@
 @using Microsoft.EntityFrameworkCore
 
 @inject InvoiceTrackerContext Context
+@inject UserSession UserSession
+@inject NavigationManager Navigation
 
 <h3>Invoice Summary</h3>
 
@@ -80,6 +82,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Redirect to login if not authenticated
+        if (!UserSession.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
         totalInvoices =
             await Context.Invoices.CountAsync();
 

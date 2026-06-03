@@ -21,7 +21,7 @@
 
         @if (invoice != null)
         {
-            <EditForm Model="invoice" OnValidSubmit="UpdateInvoice">
+            <EditForm Model="invoice" OnValidSubmit="UpdateInvoice" FormName="edit-invoice">
                 <DataAnnotationsValidator />
 
                 <div class="mb-3">
