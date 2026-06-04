@@ -111,7 +111,7 @@ h1:focus {
   width: 100%;
 }
 
-.btn {
+.btn-custom {
   background-color: #f1efe8;
   color: black;
   width: 100%;
@@ -119,7 +119,7 @@ h1:focus {
   box-shadow: 0 0 0.1rem 0.5px rgba(0, 0, 0, 0.312);
 }
 
-.btn:hover {
+.btn-custom:hover {
   background-color: rgba(0, 0, 0, 0.308);
 }
 
@@ -156,7 +156,7 @@ h1:focus {
   display: none;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1030px) {
   /* Hide table on mobile */
   .table-responsive {
     display: none;
@@ -208,7 +208,7 @@ h1:focus {
     gap: 0.5rem;
     justify-content: flex-end;
 
-    .btn {
+    .btn-custom {
       width: 75px;
       padding: 2px;
     }

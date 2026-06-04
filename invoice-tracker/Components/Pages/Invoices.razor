@@ -75,11 +75,11 @@ else
                                 <!-- Better mobile button layout -->
                                 <div class="d-flex flex-wrap gap-1">
 
-                                    <button type="button" class="btn btn-sm" @onclick="() => EditInvoice(invoice.InvoiceId)">
+                                    <button type="button" class="btn btn-custom btn-sm" @onclick="() => EditInvoice(invoice.InvoiceId)">
                                         Edit
                                     </button>
 
-                                    <button type="button" class="btn btn-sm" @onclick="() => ShowConfirm(invoice.InvoiceId)">
+                                    <button type="button" class="btn btn-custom btn-sm" @onclick="() => ShowConfirm(invoice.InvoiceId)">
                                         Delete
                                     </button>
 
@@ -114,8 +114,8 @@ else
                 </div>
                 <div class="line"></div>
                 <div class="invoice-actions">
-                    <button class="btn" @onclick="() => EditInvoice(invoice.InvoiceId)">Edit</button>
-                    <button class="btn" @onclick="() => ShowConfirm(invoice.InvoiceId)">Delete</button>
+                    <button class="btn btn-custom" @onclick="() => EditInvoice(invoice.InvoiceId)">Edit</button>
+                    <button class="btn btn-custom" @onclick="() => ShowConfirm(invoice.InvoiceId)">Delete</button>
                 </div>
             </div>
         }
