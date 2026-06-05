@@ -157,6 +157,11 @@
 
   protected override void OnInitialized()
   {
+    if (UserSession.IsAuthenticated)
+    {
+      Navigation.NavigateTo("/");
+      errorMessage = "You are already signed in.";
+    }
     editContext = new EditContext(registerUser);
   }
 
