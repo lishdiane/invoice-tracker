@@ -3,6 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject InvoiceTrackerContext Context
 @inject NavigationManager Navigation
+@inject UserSession UserSession
 
 <h3>Create Invoice</h3>
 
@@ -52,6 +53,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (!UserSession.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+        }
+
         clients = await Context.Clients
             .AsNoTracking()
             .ToListAsync();

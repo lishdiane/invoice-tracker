@@ -29,4 +29,12 @@
         Navigation.NavigateTo("/login?message=logout");
 
     }
+
+    protected override void OnInitialized()
+    {
+        if (!UserSession.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
 }
