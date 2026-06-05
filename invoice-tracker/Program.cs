@@ -2,12 +2,21 @@ using InvoiceTracker.Components;
 using Microsoft.EntityFrameworkCore;
 using InvoiceTracker;
 using InvoiceTracker.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddAuthentication(
+    CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+    });
 
 //User Session (singleton to maintain state across the app, change to other lifetime if you want to manage it differently)
 builder.Services.AddSingleton<UserSession>();
@@ -29,6 +38,8 @@ app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages:
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
