@@ -1,5 +1,9 @@
 ﻿@inherits LayoutComponentBase
 
+@using InvoiceTracker
+@inject UserSession UserSession
+@inject NavigationManager Navigation
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -7,26 +11,35 @@
 
     <main>
         <div class="top-row px-4 app-header">
-    <div class="brand">
-        <span class="logo">📄</span>
-        <span class="title">Invoice Tracker</span>
-    </div>
+            <div class="brand">
+                <span class="logo">📄</span>
+                <span class="title">Invoice Tracker</span>
+            </div>
 
-    <div class="user-area">
-        <span>Your business Financial Dashboard
-        </span>
-    </div>
-    <div class="top-row px-4">
-        <a href="/signup">Sign Up</a>
-    </div>
-</div>
+            <div class="user-area">
+                <span>Your business Financial Dashboard
+                </span>
+            </div>
+            <div class="top-row px-4">
+                @if (UserSession.IsAuthenticated)
+                {
+                    <a href="/profile">@UserSession.Username</a>
+                    <button class="btn btn-link" @onclick="Logout">Logout</button>
+                }
+                else
+                {
+                    <a href="/login">Login</a>
+                    <a href="/signup">Sign Up</a>
+                }
+            </div>
+        </div>
 
         <article class="content px-4">
             @Body
         </article>
 
         <footer class="app-footer">
-    © 2026 Invoice Tracker | Team 02 Project
+            © 2026 Invoice Tracker | Team 02 Project
         </footer>
     </main>
 </div>
@@ -36,3 +49,16 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+
+@code
+{
+    private void Logout()
+    {
+        Console.WriteLine("Logout");
+        UserSession.IsAuthenticated = false;
+        UserSession.UserId = 0;
+        UserSession.Username = string.Empty;
+        Navigation.NavigateTo("/login?message=logout", true);
+    }
+}
