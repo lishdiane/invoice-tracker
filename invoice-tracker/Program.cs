@@ -17,6 +17,7 @@ builder.Services.AddAuthentication(
         options.LoginPath = "/login";
         options.LogoutPath = "/logout";
     });
+builder.Services.AddAuthorization();
 
 //User Session (singleton to maintain state across the app, change to other lifetime if you want to manage it differently)
 builder.Services.AddSingleton<UserSession>();
