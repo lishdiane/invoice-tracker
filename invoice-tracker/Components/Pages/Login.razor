@@ -1,4 +1,5 @@
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
 @page "/login"
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
@@ -42,6 +43,7 @@
     private LoginModel loginModel = new();
     private string errorMessage = "";
     private string? successMessage;
+    private readonly PasswordHasher<User> _passwordHasher = new();
     protected override void OnInitialized()
     {
         var uri = new Uri(Navigation.Uri);
@@ -58,13 +60,19 @@
         .FirstOrDefaultAsync(u =>
             u.Username == loginModel.Username);
         
-        if (user != null &&
-            user.Password == loginModel.Password)
+        if (user != null)
         {
+            var result = _passwordHasher.VerifyHashedPassword(
+                user, 
+                user.Password, 
+                loginModel.Password);
+
+            if (result == PasswordVerificationResult.Success)
             UserSession.IsAuthenticated = true;
             UserSession.UserId = user.UserId;
             UserSession.Username = user.Username;
             Navigation.NavigateTo("/invoices");
+            return;
         }
         else
         {

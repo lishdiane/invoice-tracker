@@ -5,6 +5,7 @@
 
 @inject InvoiceTrackerContext Context
 @inject NavigationManager Navigation
+@inject UserSession UserSession
 
 <ErrorBoundary>
     <ChildContent>
@@ -68,6 +69,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (!UserSession.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+        }
+
         invoice = await Context.Invoices
             .Include(i => i.Client)
             .Include(i => i.InvoiceProducts)
