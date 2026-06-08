@@ -6,36 +6,38 @@
 @inject InvoiceTrackerContext DbContext
 @inject UserSession UserSession
 
-<h3>Login</h3>
-
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="alert alert-danger">
-        @errorMessage
-    </div>
-}
-@if (!string.IsNullOrEmpty(successMessage))
-{
-    <div class="alert alert-success">
-        @successMessage
-    </div>
-}
-<EditForm Model="@loginModel" OnValidSubmit="HandleLogin" ForName="login-form">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <InputText id="username" class="form-control" @bind-Value="loginModel.Username" />
-    </div>
-
-    <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Login</button>
-</EditForm>
+<div class="profile-card">
+    <h3>Login</h3>
+    
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">
+            @errorMessage
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success">
+            @successMessage
+        </div>
+    }
+    <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" FormName="login-form">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+    
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <InputText id="username" class="form-control" @bind-Value="loginModel.Username" />
+        </div>
+    
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" />
+        </div>
+    
+        <button type="submit" class="btn btn-primary">Login</button>
+    </EditForm>
+</div>
 
 
 
@@ -55,29 +57,36 @@
         }
     }
     private async Task HandleLogin()
-    {        
-        var user = await DbContext.Users
-        .FirstOrDefaultAsync(u =>
-            u.Username == loginModel.Username);
-        
-        if (user != null)
-        {
-            var result = _passwordHasher.VerifyHashedPassword(
-                user, 
-                user.Password, 
-                loginModel.Password);
+    {
+        errorMessage = "";
 
-            if (result == PasswordVerificationResult.Success)
+        var user = await DbContext.Users
+            .FirstOrDefaultAsync(u =>
+                u.Username == loginModel.Username);
+
+        if (user == null)
+        {
+            errorMessage = "Invalid username or password";
+            return;
+        }
+
+        var result = _passwordHasher.VerifyHashedPassword(
+            user,
+            user.Password,
+            loginModel.Password);
+
+        if (result == PasswordVerificationResult.Success)
+        {
             UserSession.IsAuthenticated = true;
             UserSession.UserId = user.UserId;
             UserSession.Username = user.Username;
+
             Navigation.NavigateTo("/invoices");
-            return;
         }
         else
         {
             errorMessage = "Invalid username or password";
-        } 
+        }
     }
 
 }
