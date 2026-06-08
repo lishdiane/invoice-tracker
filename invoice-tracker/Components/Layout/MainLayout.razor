@@ -23,7 +23,7 @@
             <div class="top-row px-4">
                 @if (UserSession.IsAuthenticated)
                 {
-                    <a href="/profile">@UserSession.Username</a>
+                    <a href="/account">@UserSession.Username</a>
                     <button class="btn btn-link" @onclick="Logout">Logout</button>
                 }
                 else
