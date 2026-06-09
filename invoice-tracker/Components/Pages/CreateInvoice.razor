@@ -25,22 +25,26 @@
                 }
             </InputSelect>
         </div>
-        
-                <div class="mb-3">
-            <label class="form-label">Product</label>
 
-            <div class="product-selection">
-            <InputSelect class="form-control" @bind-Value="invoiceProduct.ProductId" @bind-Value:after="OnProductSelected">
-                <option value="">-- Select Product --</option>
+        <div class="mb-3 product-selection">
+            <div>
+                <label for="product" class="form-label">Product</label>
 
-                @foreach (var product in products)
-                {
-                    <option value="@product.ProductId">
-                        $@product.ProductPrice  @product.ProductName
-                    </option>
-                }
-            </InputSelect>
-            <label class="form-label">Quantity <input type="number" @bind=invoiceProduct.Quantity/></label>
+                <InputSelect id="product" class="form-control" @bind-Value="invoiceProduct.ProductId"
+                             @bind-Value:after="OnProductSelected">
+                    <option value="">-- Select Product --</option>
+
+                    @foreach (var product in products)
+                    {
+                        <option value="@product.ProductId">
+                            $@product.ProductPrice @product.ProductName
+                        </option>
+                    }
+                </InputSelect>
+            </div>
+            <div>
+                <label for="quantity" class="form-label">Quantity</label>
+                <input id="quantity" class="form-control" type="number" @bind=invoiceProduct.Quantity />
             </div>
         </div>
 
@@ -90,9 +94,11 @@
         invoice.DueDate = DateTime.UtcNow.Date.AddDays(30);
     }
 
-    void OnProductSelected(){
+    void OnProductSelected()
+    {
         var selected = products.FirstOrDefault(p => p.ProductId == invoiceProduct.ProductId);
-        if (selected != null){
+        if (selected != null)
+        {
             invoiceProduct.Price = selected.ProductPrice;
         }
     }
@@ -105,7 +111,7 @@
         invoice.InvoiceDate = DateTime.SpecifyKind(invoice.InvoiceDate, DateTimeKind.Utc);
         invoice.DueDate = DateTime.SpecifyKind(invoice.DueDate, DateTimeKind.Utc);
 
-        Context.Invoices.Add(invoice);     
+        Context.Invoices.Add(invoice);
         await Context.SaveChangesAsync();
 
         invoiceProduct.InvoiceId = invoice.InvoiceId;

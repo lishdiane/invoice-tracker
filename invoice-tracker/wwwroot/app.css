@@ -123,6 +123,7 @@ h1:focus {
   background-color: rgba(0, 0, 0, 0.308);
 }
 
+
 .custom-table tbody tr {
   background: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.212);
@@ -145,6 +146,30 @@ h1:focus {
   max-width: 600px;
   width: 90%;
   margin: 0 auto;
+
+  select {
+    appearance: auto;
+  }
+}
+
+.product-selection {
+  display: flex;
+  gap: 1rem;
+
+  :nth-child(1) {
+    flex: 3; 
+  }
+
+  :nth-child(2) {
+    flex: 1;
+  }
+  
+  input {
+    width: 100%;
+  }
+
+  
+  
 }
 
 .centered {
