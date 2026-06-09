@@ -242,6 +242,7 @@ else
         invoices = await Context.Invoices
             .Include(i => i.Client)
             .Include(i => i.InvoiceProducts)
+            .Where(i => UserSession.UserId == i.UserId)
             .ToListAsync();
     }
 
@@ -296,6 +297,7 @@ else
         var query = Context.Invoices
             .Include(i => i.Client)
             .Include(i => i.InvoiceProducts)
+            .Where(i => UserSession.UserId == i.UserId)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
