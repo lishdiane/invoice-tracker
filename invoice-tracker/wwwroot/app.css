@@ -183,6 +183,12 @@ h1:focus {
   color: gray;
 }
 
+.btn-centered {
+  display: block;
+  margin: 0 auto;
+  margin-top: 1rem;
+}
+
 @media (max-width: 1030px) {
   /* Hide table on mobile */
   .table-responsive {
