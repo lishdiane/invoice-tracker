@@ -156,6 +156,24 @@ h1:focus {
   display: none;
 }
 
+.short-form {
+  max-width: 150px;
+}
+
+.medium-form {
+  max-width: 300px;
+}
+
+.centered {
+  justify-content: center;
+}
+
+.filter-section {
+  /* background-color: #fbfaf7; */
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
+
 @media (max-width: 1030px) {
   /* Hide table on mobile */
   .table-responsive {
