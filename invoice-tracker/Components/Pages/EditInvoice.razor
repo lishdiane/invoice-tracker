@@ -7,16 +7,19 @@
 @inject NavigationManager Navigation
 @inject UserSession UserSession
 
+<PageTitle>Edit Invoice</PageTitle>
+
+
 <ErrorBoundary>
     <ChildContent>
 
-        <h3>Edit Invoice</h3>
+        <h1>Edit Invoice</h1>
 
         @if (invoice?.Client != null)
         {
             <div class="mb-3">
-                <label>Client</label>
-                <input class="form-control" value="@invoice.Client.ClientName" disabled />
+                <label for="clientName">Client</label>
+                <input id="clientName" class="form-control" value="@invoice.Client.ClientName" disabled />
             </div>
         }
 
@@ -26,14 +29,13 @@
                 <DataAnnotationsValidator />
 
                 <div class="mb-3">
-                    <label>Due Date</label>
-                    <InputDate class="form-control"
-                               @bind-Value="invoice.DueDate" />
+                    <label for="dueDate">Due Date</label>
+                    <InputDate id="dueDate" class="form-control" @bind-Value="invoice.DueDate" />
                 </div>
 
                 <div class="mb-3">
-                    <label>Status</label>
-                    <InputCheckbox @bind-Value="invoice.IsPaid" />
+                    <label for="isPaid">Status</label>
+                    <InputCheckbox id="isPaid" @bind-Value="invoice.IsPaid" />
                     Paid
                 </div>
 
@@ -50,7 +52,6 @@
         {
             <p>Loading...</p>
         }
-
     </ChildContent>
 
     <ErrorContent Context="ex">
