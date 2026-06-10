@@ -151,7 +151,7 @@ else
                     {
                         <tr>
                             <td>@invoice.InvoiceId</td>
-                            <td>@invoice.Client.ClientName</td>
+                            <td><a href="/invoices/view/@invoice.InvoiceId" class="black-link">@invoice.Client.ClientName</a></td>
                             <td>@invoice.InvoiceDate.ToShortDateString()</td>
                             <td>@invoice.DueDate.ToShortDateString()</td>
 
@@ -300,7 +300,7 @@ else
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            query = query.Where(i => i.Client.ClientName.Contains(searchTerm));
+            query = query.Where(i => EF.Functions.ILike(i.Client.ClientName, $"%{searchTerm}%"));
         }
 
         if (fromDate != null)
