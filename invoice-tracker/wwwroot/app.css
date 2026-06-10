@@ -302,3 +302,48 @@ h1:focus {
 .state-field {
     max-width: 120px;
 }
+
+.hero-section {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.hero-text {
+    max-width: 700px;
+    margin: 1rem auto;
+    color: #666;
+}
+
+.action-buttons {
+    margin-top: 1.5rem;
+}
+
+.action-buttons a {
+    margin: 0 0.5rem;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.feature-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 1rem;
+    background: white;
+}
+
+.getting-started {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-top: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
