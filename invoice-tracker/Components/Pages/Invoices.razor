@@ -30,10 +30,11 @@ else
         </div>
     }
 
-     <!-- Filters -->
-    <div class="filter-section">
+    <!-- Filters -->
+    <div class="filter-section page-content filter-box">
         <div class="filters mb-3 d-flex flex-wrap gap-2 centered">
-            <input type="text" class="form-control form-control-sm medium-form" placeholder="Search by client name..." @bind="searchTerm" @bind:event="oninput" />
+            <input type="text" class="form-control form-control-sm medium-form" placeholder="Search by client name..."
+                   @bind="searchTerm" @bind:event="oninput" />
 
             <select class="form-select form-select-sm short-form" @bind="statusFilter">
                 <option value="">All Statuses</option>
@@ -41,17 +42,23 @@ else
                 <option value="unpaid">Unpaid</option>
             </select>
 
-            <!-- date filter -->
-            <label>From:</label>
-            <input type="date" class="form-control form-control-sm short-form" @bind="fromDate" />
-            <label>To:</label>
-            <input type="date" class="form-control form-control-sm short-form" @bind="toDate" />
+            <!-- date filter --> 
+            <div class=" d-flex flex-wrap gap-2">
+            <div class="date-group">
+                <label>From:</label>
+                <input type="date" class="form-control form-control-sm short-form" @bind="fromDate" />
+            </div>
+            <div class="date-group">
+                <label>To:</label>
+                <input type="date" class="form-control form-control-sm short-form" @bind="toDate" />
+            </div>
+            </div>
         </div>
         <div class="d-flex gap-2 mb-3 centered">
-            <button class="btn btn-primary btn-sm" @onclick="ApplyFilters">
+            <button class="btn btn-custom btn-primary btn-sm" @onclick="ApplyFilters">
                 Apply Filters
             </button>
-            <button class="btn btn-secondary btn-sm" @onclick="ClearFilters">
+            <button class="btn btn-custom btn-secondary btn-sm" @onclick="ClearFilters">
                 Clear Filters
             </button>
         </div>
@@ -174,11 +181,13 @@ else
                                 <!-- Better mobile button layout -->
                                 <div class="d-flex flex-wrap gap-1">
 
-                                    <button type="button" class="btn btn-custom btn-sm" @onclick="() => EditInvoice(invoice.InvoiceId)">
+                                    <button type="button" class="btn btn-custom btn-sm"
+                                            @onclick="() => EditInvoice(invoice.InvoiceId)">
                                         Edit
                                     </button>
 
-                                    <button type="button" class="btn btn-custom btn-sm" @onclick="() => ShowConfirm(invoice.InvoiceId)">
+                                    <button type="button" class="btn btn-custom btn-sm"
+                                            @onclick="() => ShowConfirm(invoice.InvoiceId)">
                                         Delete
                                     </button>
 
@@ -242,6 +251,7 @@ else
         invoices = await Context.Invoices
             .Include(i => i.Client)
             .Include(i => i.InvoiceProducts)
+            .Where(i => UserSession.UserId == i.UserId)
             .ToListAsync();
     }
 
@@ -296,6 +306,7 @@ else
         var query = Context.Invoices
             .Include(i => i.Client)
             .Include(i => i.InvoiceProducts)
+            .Where(i => UserSession.UserId == i.UserId)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))

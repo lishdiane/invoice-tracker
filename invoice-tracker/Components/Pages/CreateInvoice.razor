@@ -26,6 +26,28 @@
             </InputSelect>
         </div>
 
+        <div class="mb-3 product-selection">
+            <div>
+                <label for="product" class="form-label">Product</label>
+
+                <InputSelect id="product" class="form-control" @bind-Value="invoiceProduct.ProductId"
+                             @bind-Value:after="OnProductSelected">
+                    <option value="">-- Select Product --</option>
+
+                    @foreach (var product in products)
+                    {
+                        <option value="@product.ProductId">
+                            $@product.ProductPrice @product.ProductName
+                        </option>
+                    }
+                </InputSelect>
+            </div>
+            <div>
+                <label for="quantity" class="form-label">Quantity</label>
+                <input id="quantity" class="form-control" type="number" @bind=invoiceProduct.Quantity />
+            </div>
+        </div>
+
         <div class="mb-3">
             <label class="form-label">Invoice Date</label>
             <InputDate class="form-control" @bind-Value="invoice.InvoiceDate" />
@@ -35,17 +57,20 @@
             <label class="form-label">Due Date</label>
             <InputDate class="form-control" @bind-Value="invoice.DueDate" />
         </div>
-
-        <button type="submit" class="btn btn-custom btn-primary">
-            Save Invoice
-        </button>
+        <div class="centered">
+            <button type="submit" class="btn btn-custom btn-primary">
+                Save Invoice
+            </button>
+        </div>
     </EditForm>
 </div>
 
 @code {
 
     Invoice invoice = new();
+    InvoiceProduct invoiceProduct = new() { Quantity = 1 };
     List<Client> clients = new();
+    List<Product> products = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,12 +81,27 @@
 
         clients = await Context.Clients
             .AsNoTracking()
+            .Where(client => client.UserId == UserSession.UserId)
             .ToListAsync();
 
-        invoice.UserId = 1;
+        products = await Context.Products
+            .AsNoTracking()
+            .Where(product => product.UserId == UserSession.UserId)
+            .ToListAsync();
+
+        invoice.UserId = UserSession.UserId;
 
         invoice.InvoiceDate = DateTime.UtcNow.Date;
         invoice.DueDate = DateTime.UtcNow.Date.AddDays(30);
+    }
+
+    void OnProductSelected()
+    {
+        var selected = products.FirstOrDefault(p => p.ProductId == invoiceProduct.ProductId);
+        if (selected != null)
+        {
+            invoiceProduct.Price = selected.ProductPrice;
+        }
     }
 
     async Task SaveInvoice()
@@ -73,6 +113,10 @@
         invoice.DueDate = DateTime.SpecifyKind(invoice.DueDate, DateTimeKind.Utc);
 
         Context.Invoices.Add(invoice);
+        await Context.SaveChangesAsync();
+
+        invoiceProduct.InvoiceId = invoice.InvoiceId;
+        Context.InvoiceProducts.Add(invoiceProduct);
         await Context.SaveChangesAsync();
 
         Navigation.NavigateTo("/invoices");
