@@ -3,7 +3,6 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-
 }
 
 main {
@@ -110,6 +109,7 @@ main {
     text-align: center;
     padding: 1rem;
     border-top: 1px solid #d6d5d5;
-    background: #f7f7f7;
+    background-color: #fbfaf7;
+    margin-top: auto;
 }
 
