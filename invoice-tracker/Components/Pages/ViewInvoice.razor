@@ -39,15 +39,17 @@ else
 
             <p>
                 <strong>Status:</strong>
-                @(invoice.IsPaid ? "Paid" : "Unpaid")
+                <span class="invoice-status @(invoice.IsPaid ? "paid" : "unpaid")">
+                    @(invoice.IsPaid ? "Paid" : "Unpaid")
+                </span>
             </p>
-
-            <h5>Products</h5>
 
             @if (invoice.InvoiceProducts != null &&
       invoice.InvoiceProducts.Any())
             {
-                <table class="table table-striped">
+                <div class="page-content">
+                    <h5>Products</h5>
+                <table class=" custom-table table">
                     <thead>
                         <tr>
                             <th>Product ID</th>
@@ -69,8 +71,9 @@ else
                         }
                     </tbody>
                 </table>
+                </div>
 
-                <h5>
+                <h5 class="grand-total">
                     Grand Total:
                     @(invoice.InvoiceProducts.Sum(i => i.Quantity * i.Price).ToString("C"))
                 </h5>

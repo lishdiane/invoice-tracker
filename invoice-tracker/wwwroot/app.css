@@ -126,6 +126,9 @@ h1:focus {
 .btn-custom:hover {
   background-color: rgba(0, 0, 0, 0.308);
 }
+.btn-success {
+  background-color: #1D9E75 ;
+}
 
 .custom-table tbody tr {
   background: white;
@@ -202,6 +205,10 @@ h1:focus {
 .date-group {
   display: flex;
   gap: 0.5rem;
+}
+
+.grand-total {
+  padding-bottom: 2rem;
 }
 
 @media (max-width: 1030px) {
