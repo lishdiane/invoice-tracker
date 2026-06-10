@@ -1,0 +1,191 @@
+@page "/account"
+
+@using System.Globalization;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.EntityFrameworkCore;
+@using InvoiceTracker
+@rendermode InteractiveServer
+@inject InvoiceTrackerContext Db
+@inject NavigationManager Navigation
+@inject UserSession UserSession
+
+<PageTitle>Account Details</PageTitle>
+
+
+  @if (currentUser == null)
+  {
+    <p>Loading...</p>
+  }
+  else
+  {
+    <div class="profile-card">
+      <h2>Account Details</h2> <br />
+
+      @if (!isEditing)
+      {
+      <p>
+        <strong>Company Name:</strong>
+        @currentUser.CompanyName
+      </p>
+
+      <p>
+        <strong>Email:</strong>
+        @currentUser.CompanyEmail
+      </p>
+
+      <p>
+        <strong>Phone:</strong>
+        @currentUser.CompanyPhone
+      </p>
+
+      <p>
+        <strong>Address:</strong><br />
+        @currentUser.CompanyAddress<br />
+        @currentUser.CompanyCity, @currentUser.CompanyState
+      </p>
+
+      <button class="btn btn-primary btn-centered" @onclick="(() => isEditing = true)">
+        Edit Account
+      </button>
+      } 
+      else
+      {
+      <EditForm Model="currentUser" OnValidSubmit="UpdateAccount" FormName="edit-account">
+        <DataAnnotationsValidator />
+        <div class="form-group">
+            <label>Email</label>
+            <InputText class="form-control" @bind-Value="currentUser.CompanyEmail" />
+        </div>
+
+        <div class="form-group">
+            <label>Phone</label>
+            <InputText class="form-control" @bind-Value="currentUser.CompanyPhone" />
+        </div>
+
+        <div class="form-group">
+            <label>Street Address</label>
+            <InputText class="form-control" @bind-Value="currentUser.CompanyAddress" />
+        </div>
+
+        <div class="address-row">
+            <div class="form-group">
+                <label>City</label>
+                <InputText class="form-control" @bind-Value="currentUser.CompanyCity" />
+            </div>
+
+            <div class="form-group state-field">
+                <label>State</label>
+                <InputText class="form-control" @bind-Value="currentUser.CompanyState" />
+            </div>
+        </div>
+
+        <button class="btn btn-primary btn-centered" @onclick="UpdateAccount">
+            Save Changes
+        </button>
+      </EditForm>
+      }
+      <div>
+        <br/>
+        <h4>Change Password</h4>
+        @if (!string.IsNullOrEmpty(passwordMessage))
+        {
+          <div class="alert alert-info">
+              @passwordMessage
+          </div>
+        }
+
+        <EditForm Model="changePassword" OnValidSubmit="ChangePassword" FormName="change-password">
+
+          <DataAnnotationsValidator />
+
+          <div class="form-group">
+            <label>Current Password</label>
+            <InputText type="password" class="form-control" @bind-Value="changePassword.CurrentPassword" />
+            <ValidationMessage For="@(() => changePassword.CurrentPassword)" />
+          </div>
+
+          <div class="form-group">
+            <label>New Password</label>
+            <InputText type="password" class="form-control" @bind-Value="changePassword.NewPassword" />
+            <ValidationMessage For="@(() => changePassword.NewPassword)" />
+          </div>
+
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <InputText type="password" class="form-control" @bind-Value="changePassword.ConfirmPassword" />
+            <ValidationMessage For="@(() => changePassword.ConfirmPassword)" />
+          </div>
+
+          <button type="submit" class="btn btn-warning btn-centered">
+            Change Password
+          </button>
+        </EditForm>
+      </div>
+
+    </div>
+  }
+
+
+
+@code{
+  private User? currentUser;
+  private ChangePasswordModel changePassword = new();
+  private string passwordMessage = "";
+  private bool isEditing = false;
+  private readonly PasswordHasher<User> _passwordHasher = new();
+
+  protected override async Task OnInitializedAsync()
+  {
+    if (!UserSession.IsAuthenticated)
+    {
+      Navigation.NavigateTo("/login");
+    }  
+    await LoadUser();
+  }
+
+  private async Task LoadUser()
+  {
+    currentUser = await Db.Users
+      .FirstOrDefaultAsync(u => u.UserId == UserSession.UserId);
+  }
+
+  private void EditAccount()
+  {
+    Navigation.NavigateTo("/edit-account");
+  }
+
+  private async Task UpdateAccount()
+  {
+    await Db.SaveChangesAsync();
+    await LoadUser();
+    isEditing = false;
+  }
+
+  private async Task ChangePassword()
+  { 
+    if (currentUser == null)
+      return;
+    
+    var result = _passwordHasher.VerifyHashedPassword(
+      currentUser, 
+      currentUser.Password, 
+      changePassword.CurrentPassword);
+
+    if (result == PasswordVerificationResult.Failed)
+    {
+      passwordMessage = "Current password is incorrect.";
+      return;
+    }
+    
+    currentUser.Password = 
+    _passwordHasher.HashPassword(
+      currentUser, 
+      changePassword.NewPassword);
+    
+    await Db.SaveChangesAsync();
+    await LoadUser();
+    passwordMessage = "Password changed successfully.";
+
+    changePassword = new ChangePasswordModel();
+  }
+}

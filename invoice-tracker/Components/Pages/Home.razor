@@ -1,7 +1,40 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+@inject UserSession UserSession
+
+
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+<button class="btn btn-primary" @onclick="NavigateToLogin">Go to Login</button>
+<button class="btn btn-outline-danger" @onclick="Logout">Logout</button>
+
+@code {
+    
+    // Method to navigate to the login page
+    private void NavigateToLogin()
+    {
+        Navigation.NavigateTo("/login");
+    }
+
+    // Logout method to clear session and redirect to login page
+    private void Logout()
+    {
+        UserSession.IsAuthenticated = false;
+        UserSession.UserId = 0;
+        UserSession.Username = string.Empty;
+        Navigation.NavigateTo("/login?message=logout");
+
+    }
+
+    protected override void OnInitialized()
+    {
+        if (!UserSession.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+}
