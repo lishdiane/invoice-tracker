@@ -5,16 +5,19 @@
 @inject NavigationManager Navigation
 @inject UserSession UserSession
 
-<h3 class="centered">Create Invoice</h3>
+<PageTitle>Create Invoice</PageTitle>
+
+
+<h1 class="centered">Create Invoice</h1>
 
 <div class="page-content create-form">
     <EditForm Model="invoice" OnValidSubmit="SaveInvoice" FormName="create-invoice">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div class="mb-3">
-            <label class="form-label">Client</label>
+            <label for="client" class="form-label">Client</label>
 
-            <InputSelect class="form-control" @bind-Value="invoice.ClientId">
+            <InputSelect id="client" class="form-control" @bind-Value="invoice.ClientId">
                 <option value="">-- Select Client --</option>
 
                 @foreach (var client in clients)
@@ -49,13 +52,13 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Invoice Date</label>
-            <InputDate class="form-control" @bind-Value="invoice.InvoiceDate" />
+            <label for="invoiceDate" class="form-label">Invoice Date</label>
+            <InputDate id="invoiceDate" class="form-control" @bind-Value="invoice.InvoiceDate" />
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Due Date</label>
-            <InputDate class="form-control" @bind-Value="invoice.DueDate" />
+            <label for="dueDate" class="form-label">Due Date</label>
+            <InputDate id="dueDate" class="form-control" @bind-Value="invoice.DueDate" />
         </div>
         <div class="centered">
             <button type="submit" class="btn btn-custom btn-primary">

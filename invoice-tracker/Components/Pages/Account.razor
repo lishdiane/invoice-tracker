@@ -19,7 +19,7 @@
   else
   {
     <div class="profile-card">
-      <h2>Account Details</h2> <br />
+<h1>Account Details</h1> <br />
 
       @if (!isEditing)
       {
@@ -53,29 +53,29 @@
       <EditForm Model="currentUser" OnValidSubmit="UpdateAccount" FormName="edit-account">
         <DataAnnotationsValidator />
         <div class="form-group">
-            <label>Email</label>
-            <InputText class="form-control" @bind-Value="currentUser.CompanyEmail" />
+            <label for="companyEmail">Email</label>
+            <InputText id="companyEmail" class="form-control" @bind-Value="currentUser.CompanyEmail" />
         </div>
 
         <div class="form-group">
-            <label>Phone</label>
-            <InputText class="form-control" @bind-Value="currentUser.CompanyPhone" />
+            <label for="companyPhone">Phone</label>
+            <InputText id="companyPhone" class="form-control" @bind-Value="currentUser.CompanyPhone" />
         </div>
 
         <div class="form-group">
-            <label>Street Address</label>
-            <InputText class="form-control" @bind-Value="currentUser.CompanyAddress" />
+            <label for="companyAddress">Street Address</label>
+            <InputText id="companyAddress" class="form-control" @bind-Value="currentUser.CompanyAddress" />
         </div>
 
         <div class="address-row">
             <div class="form-group">
-                <label>City</label>
-                <InputText class="form-control" @bind-Value="currentUser.CompanyCity" />
+                <label for="companyCity">City</label>
+                <InputText id="companyCity" class="form-control" @bind-Value="currentUser.CompanyCity" />
             </div>
 
             <div class="form-group state-field">
-                <label>State</label>
-                <InputText class="form-control" @bind-Value="currentUser.CompanyState" />
+                <label for="companyState">State</label>
+                <InputText id="companyState" class="form-control" @bind-Value="currentUser.CompanyState" />
             </div>
         </div>
 
@@ -86,7 +86,7 @@
       }
       <div>
         <br/>
-        <h4>Change Password</h4>
+        <h2>Change Password</h2>
         @if (!string.IsNullOrEmpty(passwordMessage))
         {
           <div class="alert alert-info">
@@ -99,20 +99,20 @@
           <DataAnnotationsValidator />
 
           <div class="form-group">
-            <label>Current Password</label>
-            <InputText type="password" class="form-control" @bind-Value="changePassword.CurrentPassword" />
+            <label for="currentPassword">Current Password</label>
+            <InputText id="currentPassword" type="password" class="form-control" @bind-Value="changePassword.CurrentPassword" />
             <ValidationMessage For="@(() => changePassword.CurrentPassword)" />
           </div>
 
           <div class="form-group">
-            <label>New Password</label>
-            <InputText type="password" class="form-control" @bind-Value="changePassword.NewPassword" />
+            <label for="newPassword">New Password</label>
+            <InputText id="newPassword" type="password" class="form-control" @bind-Value="changePassword.NewPassword" />
             <ValidationMessage For="@(() => changePassword.NewPassword)" />
           </div>
 
           <div class="form-group">
-            <label>Confirm New Password</label>
-            <InputText type="password" class="form-control" @bind-Value="changePassword.ConfirmPassword" />
+            <label for="confirmPassword">Confirm New Password</label>
+            <InputText id="confirmPassword" type="password" class="form-control" @bind-Value="changePassword.ConfirmPassword" />
             <ValidationMessage For="@(() => changePassword.ConfirmPassword)" />
           </div>
 
@@ -124,7 +124,6 @@
 
     </div>
   }
-
 
 
 @code{
