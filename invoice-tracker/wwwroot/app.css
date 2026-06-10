@@ -209,6 +209,19 @@ h1:focus {
 
 .grand-total {
   padding-bottom: 2rem;
+.black-link {
+  color: black;
+  text-decoration: none;
+}
+
+.black-link:hover {
+  color: gray;
+}
+
+.btn-centered {
+  display: block;
+  margin: 0 auto;
+  margin-top: 1rem;
 }
 
 @media (max-width: 1030px) {
