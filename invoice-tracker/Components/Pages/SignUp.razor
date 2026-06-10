@@ -1,4 +1,5 @@
 @page "/signup"
+@layout LoginLayout
 
 @using System.Globalization;
 @using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,10 @@
 <div class="profile-card">
   <h1>Create Account</h1>
 
-  <EditForm EditContext="editContext" OnValidSubmit="HandleSignUp" FormName="SignUpForm">
+  <EditForm 
+    EditContext="editContext" 
+    OnValidSubmit="HandleSignUp" 
+    FormName="SignUpForm">
     <DataAnnotationsValidator />
 
     @if (!string.IsNullOrEmpty(errorMessage))
@@ -30,9 +34,9 @@
         <label for="username">Username</label>
         <InputText 
           id="username" 
-          class="@GetFieldCssClass(nameof(registerUser.Username))" 
+          class="@validator.GetFieldCssClass(nameof(registerUser.Username))" 
           @bind-Value="registerUser.Username" 
-          @onblur="@(_ => ValidateField(nameof(registerUser.Username)))" />
+          @onblur="@(_ => validator.ValidateField(nameof(registerUser.Username)))" />
         <ValidationMessage For="@(() => registerUser.Username)" />
       </div>
       <div class="form-group mb-3">
@@ -40,9 +44,9 @@
         <InputText 
           id="password" 
           type="password" 
-          class="@GetFieldCssClass(nameof(registerUser.Password))" 
+          class="@validator.GetFieldCssClass(nameof(registerUser.Password))" 
           @bind-Value="registerUser.Password" 
-          @onblur="@(_ => ValidateField(nameof(registerUser.Password)))" />
+          @onblur="@(_ => validator.ValidateField(nameof(registerUser.Password)))" />
         <ValidationMessage For="@(() => registerUser.Password)" />
       </div>
       <div class="form-group mb-3">
@@ -50,9 +54,9 @@
         <InputText 
           id="confirmPassword" 
           type="password" 
-          class="@GetFieldCssClass(nameof(registerUser.ConfirmPassword))" 
+          class="@validator.GetFieldCssClass(nameof(registerUser.ConfirmPassword))" 
           @bind-Value="registerUser.ConfirmPassword"
-          @onblur="@(_ => ValidateField(nameof(registerUser.ConfirmPassword)))" />
+          @onblur="@(_ => validator.ValidateField(nameof(registerUser.ConfirmPassword)))" />
         <ValidationMessage For="@(() => registerUser.ConfirmPassword)" />
       </div>
     </fieldset>
@@ -63,18 +67,18 @@
         <label for="companyName">Company Name</label>
         <InputText 
           id="companyName" 
-          class="@GetFieldCssClass(nameof(registerUser.CompanyName))" 
+          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyName))" 
           @bind-Value="registerUser.CompanyName" 
-          @onblur="@(_ => ValidateField(nameof(registerUser.CompanyName)))" />
+          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyName)))" />
         <ValidationMessage For="@(() => registerUser.CompanyName)" />
       </div>
       <div class="form-group mb-3">
         <label for="companyEmail">Company Email</label>
         <InputText 
           id="companyEmail" 
-          class="@GetFieldCssClass(nameof(registerUser.CompanyEmail))" 
+          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyEmail))" 
           @bind-Value="registerUser.CompanyEmail" 
-          @onblur="@(_ => ValidateField(nameof(registerUser.CompanyEmail)))" />
+          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyEmail)))" />
         <ValidationMessage For="@(() => registerUser.CompanyEmail)" />
       </div>
 
@@ -82,9 +86,9 @@
         <label for="companyPhone">Company Phone</label>
         <InputText 
           id="companyPhone" 
-          class="@GetFieldCssClass(nameof(registerUser.CompanyPhone))" 
+          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyPhone))" 
           @bind-Value="registerUser.CompanyPhone" 
-          @onblur="@(_ => ValidateField(nameof(registerUser.CompanyPhone)))" />
+          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyPhone)))" />
         <ValidationMessage For="@(() => registerUser.CompanyPhone)" />
       </div>
     </fieldset>
@@ -96,9 +100,9 @@
         <label for="companyAddress">Street Address</label>
         <InputText 
           id="companyAddress" 
-          class="@GetFieldCssClass(nameof(registerUser.CompanyAddress))" 
+          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyAddress))" 
           @bind-Value="registerUser.CompanyAddress" 
-          @onblur="@(_ => ValidateField(nameof(registerUser.CompanyAddress)))" />
+          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyAddress)))" />
         <ValidationMessage For="@(() => registerUser.CompanyAddress)" />
       </div>
 
@@ -106,9 +110,9 @@
         <label for="companyCity">City</label>
         <InputText 
           id="companyCity" 
-          class="@GetFieldCssClass(nameof(registerUser.CompanyCity))" 
+          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyCity))" 
           @bind-Value="registerUser.CompanyCity" 
-          @onblur="@(_ => ValidateField(nameof(registerUser.CompanyCity)))" />
+          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyCity)))" />
         <ValidationMessage For="@(() => registerUser.CompanyCity)" />
       </div>
 
@@ -116,9 +120,9 @@
         <label for="companyState">State</label>
         <InputText 
           id="companyState" 
-          class="@GetFieldCssClass(nameof(registerUser.CompanyState))" 
+          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyState))" 
           @bind-Value="registerUser.CompanyState" 
-          @onblur="@(_ => ValidateField(nameof(registerUser.CompanyState)))" />
+          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyState)))" />
         <ValidationMessage For="@(() => registerUser.CompanyState)" />
       </div>
     </fieldset>
@@ -136,11 +140,9 @@
 @code {
 
   private HashSet<string> validatedFields = new();
-  private bool isFormValid => 
-      editContext is not null && 
-      requiredFields.All(f => validatedFields.Contains(f)) &&
-      !editContext.GetValidationMessages().Any();
+  private bool isFormValid => validator?.IsFormValid(requiredFields) ?? false;
   private RegisterUser registerUser = new();
+  private FormValidationHelper validator;
   private EditContext editContext;
   private readonly PasswordHasher<User> _passwordHasher = new();
   private string errorMessage = "";
@@ -165,16 +167,8 @@
       errorMessage = "You are already signed in.";
     }
     editContext = new EditContext(registerUser);
+    validator = new FormValidationHelper(editContext, requiredFields);
   }
-
-  private void ValidateField(string fieldName)
-  {
-    validatedFields.Add(fieldName);
-
-    editContext.NotifyFieldChanged(
-      new FieldIdentifier(registerUser, fieldName));
-  }
-
   private async Task HandleSignUp()
   {
     errorMessage = "";
@@ -192,7 +186,6 @@
 
     try
     {
-
       var user = new User
       {
         Username = registerUser.Username,
@@ -228,24 +221,5 @@
     {
       errorMessage = $"Database Error: {ex.Message}";
     }
-  }
-
-
-  private string GetFieldCssClass(string fieldName)
-  {
-    var field = new FieldIdentifier(registerUser, fieldName);
-
-    bool hasErrors =
-        editContext.GetValidationMessages(field).Any();
-
-    bool hasBeenModified =
-        editContext.IsModified(field);
-
-    if (!hasBeenModified)
-      return "form-control";
-
-    return hasErrors
-        ? "form-control is-invalid"
-        : "form-control is-valid";
   }
 }
