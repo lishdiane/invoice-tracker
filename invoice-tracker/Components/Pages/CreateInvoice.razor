@@ -7,10 +7,9 @@
 
 <PageTitle>Create Invoice</PageTitle>
 
-
 <h1 class="centered">Create Invoice</h1>
 
-<div class="page-content create-form">
+<div class="page-content custom-form">
     <EditForm Model="invoice" OnValidSubmit="SaveInvoice" FormName="create-invoice">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -61,8 +60,12 @@
             <InputDate id="dueDate" class="form-control" @bind-Value="invoice.DueDate" />
         </div>
         <div class="centered">
-            <button type="submit" class="btn btn-custom btn-primary">
-                Save Invoice
+            <button class="btn btn-success">
+                Save
+            </button>
+
+            <button type="button" class="btn btn-custom ms-2" @onclick="Cancel">
+                Cancel
             </button>
         </div>
     </EditForm>
@@ -122,6 +125,11 @@
         Context.InvoiceProducts.Add(invoiceProduct);
         await Context.SaveChangesAsync();
 
+        Navigation.NavigateTo("/invoices");
+    }
+
+    void Cancel()
+    {
         Navigation.NavigateTo("/invoices");
     }
 }

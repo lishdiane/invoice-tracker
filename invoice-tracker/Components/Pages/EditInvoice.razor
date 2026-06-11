@@ -13,7 +13,9 @@
 <ErrorBoundary>
     <ChildContent>
 
-        <h1>Edit Invoice</h1>
+        <h1 class="centered">Edit Invoice</h1>
+
+        <div class="page-content custom-form">
 
         @if (invoice?.Client != null)
         {
@@ -43,7 +45,7 @@
                     Update
                 </button>
 
-                <button type="button" class="btn btn-secondary ms-2" @onclick="Cancel">
+                <button type="button" class="btn btn-custom ms-2" @onclick="Cancel">
                     Cancel
                 </button>
             </EditForm>
@@ -52,6 +54,7 @@
         {
             <p>Loading...</p>
         }
+        </div>
     </ChildContent>
 
     <ErrorContent Context="ex">
