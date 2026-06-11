@@ -2,20 +2,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace InvoiceTracker
 {
-  public class Invoice
+  public class Invoice 
   {
     public int InvoiceId { get; set; }
     [Required, DataType(DataType.Date)]
     public DateTime InvoiceDate { get; set; } = DateTime.Now;
     [Required, DataType(DataType.Date)]
     public DateTime DueDate { get; set; }
-    [Required]
     public bool IsPaid { get; set; }
     public int UserId { get; set; }
-    [Required]
     public User User { get; set; } = null!;
     public int ClientId { get; set; }
-    [Required]
     public Client Client { get; set; } = null!;
     public ICollection<InvoiceProduct> InvoiceProducts { get; } = new List<InvoiceProduct>();
   }
