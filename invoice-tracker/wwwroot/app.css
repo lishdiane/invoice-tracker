@@ -322,6 +322,11 @@ h1:focus {
     margin: 0 0.5rem;
 }
 
+.action-buttons .btn:hover {
+    transform: translateY(-3px);
+    
+}
+
 .feature-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -330,10 +335,30 @@ h1:focus {
 }
 
 .feature-card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 1rem;
-    background: white;
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border-top: 4px solid #1d9e75;
+}
+
+/* .feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+} */
+
+.feature-card h3 {
+    padding: 0;
+    margin-bottom: .75rem;
+    color: #000604;
+    font-weight: 600;
+}
+
+.feature-card p {
+    color: #666;
+    margin-bottom: 0;
+    line-height: 1.6;
 }
 
 .getting-started {
@@ -346,4 +371,35 @@ h1:focus {
     .feature-grid {
         grid-template-columns: 1fr;
     }
+}
+
+.getting-started h3 {
+    text-align: center;
+    color: #010a07;
+    font-weight: 600;
+}
+
+.getting-started-list {
+    list-style: none;
+    padding: 0;
+}
+
+.getting-started-list li {
+    margin-bottom: .75rem;
+}
+
+.getting-started-list a {
+    display: block;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    text-decoration:solid;
+    color: #030303;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    transition: all .2s ease;
+}
+
+.getting-started-list a:hover {
+    transform: translateX(6px);
+    color: #2964e2;
 }
