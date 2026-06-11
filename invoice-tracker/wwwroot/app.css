@@ -29,9 +29,7 @@ a,
     0 0 0 0.25rem #258cfb;
 }
 
-.content {
-  padding-top: 1.1rem;
-}
+
 
 h3 {
   padding: 1rem;
@@ -438,4 +436,59 @@ h1:focus {
 .getting-started-list a:hover {
     transform: translateX(6px);
     color: #2964e2;
+}
+
+.my-valid {
+  border-color: #198754;
+}
+
+.my-invalid {
+  border-color: #dc3545;
+}
+
+.product-line {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.remove-btn {
+  color: #dc3545;
+  cursor: pointer;
+}
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .5);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1050;
+}
+
+.custom-modal {
+  background: white;
+  padding: 1.5rem;
+  border-radius: .5rem;
+  width: 450px;
+  max-width: 90vw;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: .5rem;
+}
+
+.invoice-total {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-top: 2px solid var(--accent-color);
+
+  text-align: left;
+  font-size: 1.1rem;
 }
