@@ -1,4 +1,4 @@
-@page "/invoice-summary"
+@page "/dashboard"
 
 @using Microsoft.EntityFrameworkCore
 
@@ -6,15 +6,18 @@
 @inject UserSession UserSession
 @inject NavigationManager Navigation
 
-<h3>Invoice Summary</h3>
+<PageTitle>Dashboard</PageTitle>
+
+
+<h1>Dashboard</h1>
 
 <div class="row g-3">
 
     <div class="col-12 col-sm-6 col-lg-3">
         <div class="card">
             <div class="card-body text-center">
-                <h5>Total Invoices</h5>
-                <h2>@totalInvoices</h2>
+                <h2>Total Invoices</h2>
+                <h3>@totalInvoices</h3>
             </div>
         </div>
     </div>
@@ -22,8 +25,8 @@
     <div class="col-12 col-sm-6 col-lg-3">
         <div class="card">
             <div class="card-body text-center">
-                <h5>Paid</h5>
-                <h2>@paidInvoices</h2>
+                <h2>Paid</h2>
+                <h3>@paidInvoices</h3>
             </div>
         </div>
     </div>
@@ -31,8 +34,8 @@
     <div class="col-12 col-sm-6 col-lg-3">
         <div class="card">
             <div class="card-body text-center">
-                <h5>Unpaid</h5>
-                <h2>@unpaidInvoices</h2>
+                <h2>Unpaid</h2>
+                <h3>@unpaidInvoices</h3>
             </div>
         </div>
     </div>
@@ -50,7 +53,7 @@
                 <th>Invoice ID</th>
                 <th>Client</th>
                 <th>Status</th>
-                <th></th>
+                <th>Details</th>
             </tr>
         </thead>
 
@@ -100,6 +103,7 @@
 
         invoices = await Context.Invoices
             .Include(i => i.Client)
+            .Where(i => UserSession.UserId == i.UserId)
             .ToListAsync();
     }
 }

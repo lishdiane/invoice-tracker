@@ -2,9 +2,13 @@
 @using Microsoft.AspNetCore.Identity
 @page "/login"
 @rendermode InteractiveServer
+@layout LoginLayout
 @inject NavigationManager Navigation
 @inject InvoiceTrackerContext DbContext
 @inject UserSession UserSession
+
+<PageTitle>Login</PageTitle>
+
 
 <div class="profile-card">
     <h1>Login</h1>
@@ -36,6 +40,10 @@
         </div>
     
         <button type="submit" class="btn btn-primary btn-centered">Login</button>
+    
+        <div class="centered">
+            <p>Don't have an account? <a href="/register">Register</a></p>
+        </div>
     </EditForm>
 </div>
 
@@ -81,7 +89,7 @@
             UserSession.UserId = user.UserId;
             UserSession.Username = user.Username;
 
-            Navigation.NavigateTo("/invoices");
+            Navigation.NavigateTo("/dashboard");
         }
         else
         {
