@@ -23,7 +23,7 @@
             View Invoices
         </a>
 
-        <a href="/invoices/create" class="btn btn-success">
+        <a href="/create-invoice" class="btn btn-success">
             Create Invoice
         </a>
     </div>
@@ -57,31 +57,25 @@
 <div class="getting-started">
     <h3>Getting Started</h3>
     <ul class="getting-started-list">
+        <li>
+            <a href="/create-invoice">
+                Create a new invoice 
+            </a>
+        </li>
 
-    <li>
-        <a href="/invoices/create">
-            Create a new invoice 
-        </a>
-    </li>
+        <li>
+            <a href="/invoices">
+                View and manage invoices 
+            </a>
+        </li>
 
-    <li>
-        <a href="/invoices">
-            View and manage invoices 
-        </a>
-    </li>
-
-    <li>
-        <a href="/invoice-summary">
-            Review invoice summaries 
-        </a>
-    </li>
-
-</ul>
+        <li>
+            <a href="/dashboard">
+                Review invoice summaries 
+            </a>
+        </li>
+    </ul>
 </div>
-
-
-<button class="btn btn-primary" @onclick="NavigateToLogin">Go to Login</button>
-<button class="btn btn-outline-danger" @onclick="Logout">Logout</button>
 
 @code {
     
@@ -99,17 +93,5 @@
         UserSession.Username = string.Empty;
         Navigation.NavigateTo("/login?message=logout");
 
-    }
-
-    @* protected override void OnInitialized()
-    {
-        if (!UserSession.IsAuthenticated)
-        {
-            Navigation.NavigateTo("/login");
-        }
-        else
-        {
-            Navigation.NavigateTo("/dashboard");
-        }
     }
 }
