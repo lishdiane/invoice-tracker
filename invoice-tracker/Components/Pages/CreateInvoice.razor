@@ -5,7 +5,10 @@
 @inject NavigationManager Navigation
 @inject UserSession UserSession
 
-<h3 class="centered">Create Invoice</h3>
+<PageTitle>Create Invoice</PageTitle>
+
+
+<h1 class="centered">Create Invoice</h1>
 
 <div class="page-content create-form">
     <EditForm 
@@ -14,7 +17,7 @@
         FormName="create-invoice">
         <DataAnnotationsValidator />
         <div class="mb-3">
-            <label class="form-label">Client</label>
+            <label for="client" class="form-label">Client</label>
 
             <InputSelect 
                 class="@validator.GetFieldCssClass(nameof(createInvoice.ClientId))" 

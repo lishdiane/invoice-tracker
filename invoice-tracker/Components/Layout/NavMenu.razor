@@ -1,12 +1,19 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
-    <a class="navbar-brand" href="dashboard">
-    Invoice Tracker
-    </a>
+    <div style="display:flex; align-items:center;">
+        <img src="/invoice-dollar-svgrepo-com.svg"
+             alt="Logo"
+             style="width:50px;height:50px;" />
+
+        <span style="color:white;margin-left:10px;">
+            Invoice Tracker
+        </span>
+    </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<input aria-label="Navigation menu" type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()"
+     onkeydown="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
 
         <div class="nav-item px-3">
@@ -26,6 +33,7 @@
                 <span class="bi bi-file-earmark-plus" aria-hidden="true"></span> Create Invoice
             </NavLink>
         </div>
+
     </nav>
 </div>
 

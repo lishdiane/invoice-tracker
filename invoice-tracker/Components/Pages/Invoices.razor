@@ -5,7 +5,10 @@
 @inject NavigationManager Navigation
 @inject UserSession UserSession
 
-<h3>Invoices</h3>
+<PageTitle>Invoices</PageTitle>
+
+
+<h1>Invoices</h1>
 
 @if (invoices == null)
 {
@@ -33,25 +36,27 @@ else
     <!-- Filters -->
     <div class="filter-section page-content filter-box">
         <div class="filters mb-3 d-flex flex-wrap gap-2 centered">
-            <input type="text" class="form-control form-control-sm medium-form" placeholder="Search by client name..."
-                   @bind="searchTerm" @bind:event="oninput" />
+            <label for="search">Search by client name</label>
+            <input type="text" id="search" class="form-control form-control-sm medium-form"
+                   placeholder="Search by client name..." @bind="searchTerm" @bind:event="oninput" />
 
-            <select class="form-select form-select-sm short-form" @bind="statusFilter">
+            <label for="status">Status</label>
+            <select id="status" class="form-select form-select-sm short-form" @bind="statusFilter">
                 <option value="">All Statuses</option>
                 <option value="paid">Paid</option>
                 <option value="unpaid">Unpaid</option>
             </select>
 
-            <!-- date filter --> 
+            <!-- date filter -->
             <div class=" d-flex flex-wrap gap-2">
-            <div class="date-group">
-                <label>From:</label>
-                <input type="date" class="form-control form-control-sm short-form" @bind="fromDate" />
-            </div>
-            <div class="date-group">
-                <label>To:</label>
-                <input type="date" class="form-control form-control-sm short-form" @bind="toDate" />
-            </div>
+                <div class="date-group">
+                    <label for="fromDate">From:</label>
+                    <input id="fromDate" type="date" class="form-control form-control-sm short-form" @bind="fromDate" />
+                </div>
+                <div class="date-group">
+                    <label for="toDate">To:</label>
+                    <input id="toDate" type="date" class="form-control form-control-sm short-form" @bind="toDate" />
+                </div>
             </div>
         </div>
         <div class="d-flex gap-2 mb-3 centered">
@@ -158,7 +163,8 @@ else
                     {
                         <tr>
                             <td>@invoice.InvoiceId</td>
-                            <td><a href="/invoices/view/@invoice.InvoiceId" class="black-link">@invoice.Client.ClientName</a></td>
+                            <td><a href="/invoices/view/@invoice.InvoiceId" class="black-link">@invoice.Client.ClientName</a>
+                            </td>
                             <td>@invoice.InvoiceDate.ToShortDateString()</td>
                             <td>@invoice.DueDate.ToShortDateString()</td>
 
