@@ -3,11 +3,82 @@
 @inject NavigationManager Navigation
 @inject UserSession UserSession
 
+@* @attribute [AllowAnonymous] *@
+
 
 
 <PageTitle>Home</PageTitle>
+<div class="hero-section">
+    <h1>Welcome to Invoice Tracker</h1>
 
-<h1>Hello, world!</h1>
+    <p class="hero-text">
+        Simplify invoice management, track client payments,
+        and keep your billing records organized in one place.
+    </p>
+
+    
+
+    <div class="action-buttons">
+        <a href="/invoices" class="btn btn-primary">
+            View Invoices
+        </a>
+
+        <a href="/invoices/create" class="btn btn-success">
+            Create Invoice
+        </a>
+    </div>
+</div>
+
+<div class="feature-grid">
+
+    <div class="feature-card">
+        <h3>Create Invoices</h3>
+        <p>
+            Generate professional invoices quickly and efficiently.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Manage Records</h3>
+        <p>
+            View, edit, and organize invoice information with ease.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Invoice Summary</h3>
+        <p>
+            Access financial summaries and invoice statistics.
+        </p>
+    </div>
+
+</div>
+
+<div class="getting-started">
+    <h3>Getting Started</h3>
+    <ul class="getting-started-list">
+
+    <li>
+        <a href="/invoices/create">
+            Create a new invoice 
+        </a>
+    </li>
+
+    <li>
+        <a href="/invoices">
+            View and manage invoices 
+        </a>
+    </li>
+
+    <li>
+        <a href="/invoice-summary">
+            Review invoice summaries 
+        </a>
+    </li>
+
+</ul>
+</div>
+
 
 <button class="btn btn-primary" @onclick="NavigateToLogin">Go to Login</button>
 <button class="btn btn-outline-danger" @onclick="Logout">Logout</button>
@@ -30,11 +101,11 @@
 
     }
 
-    protected override void OnInitialized()
+    @* protected override void OnInitialized()
     {
         if (!UserSession.IsAuthenticated)
         {
             Navigation.NavigateTo("/login");
         }
-    }
+    } *@
 }
