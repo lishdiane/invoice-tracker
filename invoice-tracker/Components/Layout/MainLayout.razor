@@ -11,8 +11,6 @@
 
     <main>
         <div class="top-row px-4 app-header">
-
-            <div class="top-row px-4">
                 @if (UserSession.IsAuthenticated)
                 {
                     <a href="/account">@UserSession.Username</a>
@@ -23,7 +21,7 @@
                     <a href="/login">Login</a>
                     <a href="/signup">Sign Up</a>
                 }
-            </div>
+            
         </div>
 
         <article class="content px-4">
