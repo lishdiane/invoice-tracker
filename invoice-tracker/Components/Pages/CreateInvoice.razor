@@ -331,9 +331,14 @@
     // (value of -1), show the client creation modal
     private void OnClientChanged()
     {
+        Console.WriteLine(selectedClientId);
         if (selectedClientId == -1)
         {
             showClientModal = true;
+        }
+        else
+        {
+            createInvoice.ClientId = selectedClientId.Value;
         }
     }
 
