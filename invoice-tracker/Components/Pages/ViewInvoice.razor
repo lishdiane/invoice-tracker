@@ -69,8 +69,8 @@ else
                                 <tr>
                                     <td>@item.ProductId</td>
                                     <td>@item.Quantity</td>
-                                    <td>@item.Price.ToString("C")</td>
-                                    <td>@((item.Quantity * item.Price).ToString("C"))</td>
+                                    <td>@item.Price.ToString("C", new System.Globalization.CultureInfo("en-US"))</td>
+                                    <td>@((item.Quantity * item.Price).ToString("C", new System.Globalization.CultureInfo("en-US")))</td>
                                 </tr>
                             }
                         </tbody>
@@ -79,7 +79,7 @@ else
 
                 <h5 class="grand-total">
                     Grand Total:
-                    @(invoice.InvoiceProducts.Sum(i => i.Quantity * i.Price).ToString("C"))
+                    @(invoice.InvoiceProducts.Sum(i => i.Quantity * i.Price).ToString("C", new System.Globalization.CultureInfo("en-US")))
                 </h5>
             }
             else

@@ -180,7 +180,7 @@ else
                             </td>
 
                             <td>
-                                @GetTotal(invoice).ToString("C")
+                                @GetTotal(invoice).ToString("C", new System.Globalization.CultureInfo("en-US"))
                             </td>
 
                             <td>
@@ -224,7 +224,7 @@ else
                 <div class="invoice-body">
                     <div>Date: <span>@invoice.InvoiceDate.ToShortDateString()</span></div>
                     <div>Due: <span>@invoice.DueDate.ToShortDateString()</span></div>
-                    <div>Total: <span>@GetTotal(invoice).ToString("C")</span></div>
+                    <div>Total: <span>@GetTotal(invoice).ToString("C", new System.Globalization.CultureInfo("en-US"))</span></div>
                 </div>
                 <div class="line"></div>
                 <div class="invoice-actions">

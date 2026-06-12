@@ -119,6 +119,20 @@ h2 {
   max-width: 75px;
 }
 
+.btn-dark {
+  background-color: #2C2C2A;
+}
+
+.btn-home {
+  background-color: #157347;
+  color: white;
+}
+
+   .btn-home:hover {
+    background-color: #157347dd;
+    color: white;
+   }
+
 .btn-custom {
   background-color: #f1efe8;
   color: black;

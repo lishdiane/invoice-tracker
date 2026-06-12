@@ -11,22 +11,16 @@
 
 
 <div class="page-content create-form">
-  <h1 class="pb-3">Create Invoice</h1>
-    <EditForm 
-        EditContext="editContext" 
-        OnValidSubmit="SaveInvoice" 
-        FormName="create-invoice">
+    <h1 class="pb-3">Create Invoice</h1>
+    <EditForm EditContext="editContext" OnValidSubmit="SaveInvoice" FormName="create-invoice">
         <DataAnnotationsValidator />
         <div class="mb-3">
             <div>
                 <label for="client" class="form-label">Client</label>
-    
-                <InputSelect 
-                    name="ClientId"
-                    class="@validator.GetFieldCssClass(nameof(createInvoice.ClientId))" 
-                    @bind-Value="selectedClientId"
-                    @bind-Value:after="OnClientChanged"
-                    @onblur="@(() => validator.ValidateField(nameof(createInvoice.ClientId)))">
+
+                <InputSelect name="ClientId" class="@validator.GetFieldCssClass(nameof(createInvoice.ClientId))"
+                             @bind-Value="selectedClientId" @bind-Value:after="OnClientChanged"
+                             @onblur="@(() => validator.ValidateField(nameof(createInvoice.ClientId)))">
                     <option value="0">-- Select Client --</option>
                     @foreach (var client in clients)
                     {
@@ -34,7 +28,7 @@
                             @client.ClientName
                         </option>
                     }
-                <option value="-1">+ New Client</option>
+                    <option value="-1">+ New Client</option>
                 </InputSelect>
                 <ValidationMessage For="@(() => createInvoice.ClientId)" />
             </div>
@@ -45,27 +39,23 @@
                 @foreach (var line in createInvoice.Lines.Select((value, index) => new { value, index }))
                 {
                     <div class="product-line">
-                        <InputSelect 
-                            class="form-control" 
-                            @bind-Value="line.value.ProductId"
-                            @bind-Value:after="() => SetActiveLine(line.value)">
+                        <InputSelect class="form-control" @bind-Value="line.value.ProductId"
+                                     @bind-Value:after="() => SetActiveLine(line.value)">
                             <option value="0">-- Select Product --</option>
 
                             @foreach (var product in products)
                             {
                                 <option value="@product.ProductId">
-                                    @product.ProductName - 
-                                    @product.ProductPrice.ToString("C")
+                                    @product.ProductName -
+                                    @product.ProductPrice.ToString("C", new System.Globalization.CultureInfo("en-US"))
                                 </option>
                             }
                         </InputSelect>
-                        <InputNumber 
-                            class="form-control"
-                            @bind-Value="line.value.Quantity" />
+                        <InputNumber class="form-control" @bind-Value="line.value.Quantity" />
 
                         <a>
-                            <button type="button" class="btn btn-custom btn-danger" 
-                                @onclick="() => RemoveProduct(line.index)">
+                            <button type="button" class="btn btn-custom btn-danger"
+                                    @onclick="() => RemoveProduct(line.index)">
                                 X
                             </button>
                         </a>
@@ -76,172 +66,144 @@
                         New Product
                     </button>
                 </a>
-                <button type="button" class="btn btn-custom btn-primary" 
-                    @onclick="AddProduct">Add Line
+                <button type="button" class="btn btn-custom btn-primary" @onclick="AddProduct">Add Line
                 </button>
-                
+
                 
             </div>
         </div>
-        
 
+        
         <div class="mb-3">
             <label class="form-label">Invoice Date</label>
-            <InputDate 
-                class="@validator.GetFieldCssClass(nameof(createInvoice.InvoiceDate))" 
-                @bind-Value="createInvoice.InvoiceDate" 
-                @onblur="@(_ => validator.ValidateField(nameof(createInvoice.InvoiceDate)))" />
+            <InputDate class="@validator.GetFieldCssClass(nameof(createInvoice.InvoiceDate))"
+                       @bind-Value="createInvoice.InvoiceDate"
+                       @onblur="@(_ => validator.ValidateField(nameof(createInvoice.InvoiceDate)))" />
             <ValidationMessage For="@(() => createInvoice.InvoiceDate)" />
         </div>
 
         <div class="mb-3">
             <label class="form-label">Due Date</label>
-            <InputDate 
-                class="@validator.GetFieldCssClass(nameof(createInvoice.DueDate))" 
-                @bind-Value="createInvoice.DueDate" 
-                @onblur="@(_ => validator.ValidateField(nameof(createInvoice.DueDate)))" />
+            <InputDate class="@validator.GetFieldCssClass(nameof(createInvoice.DueDate))"
+                       @bind-Value="createInvoice.DueDate"
+                       @onblur="@(_ => validator.ValidateField(nameof(createInvoice.DueDate)))" />
             <ValidationMessage For="@(() => createInvoice.DueDate)" />
         </div>
         <div class="invoice-total">
-            <p><strong>Invoice Total: </strong> @GetInvoiceTotal.ToString("C")</p>
-        </div>
-        <div class="centered">
-            <button type="submit" class="btn btn-success" disabled="@(!isFormValid)">
-                Save Invoice
-            </button>
-
-            <button type="button" class="btn btn-custom ms-2" @onclick="Cancel">
-                Cancel
-            </button>
-        </div>
-        
-        <ValidationSummary />
-    </EditForm>
-    @if (showProductModal)
-    {
-        <div class="modal-backdrop-custom">
-            <div class="custom-modal">
-
-                <h4>Add Product</h4>
-
-                @if (!string.IsNullOrWhiteSpace(productError))
-                {
-                    <div class="alert alert-danger">
-                        @productError
-                    </div>
-                }
-
-                <div class="mb-3">
-                    <label>Product Name</label>
-
-                    <InputText
-                        class="form-control"
-                        @bind-Value="newProduct.ProductName" />
-                </div>
-
-                <div class="mb-3">
-                    <label>Price</label>
-
-                    <InputNumber
-                        class="form-control"
-                        @bind-Value="newProduct.ProductPrice" />
-                </div>
-
-                <div class="modal-buttons">
-
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        @onclick="CloseProductModal">
-                        Cancel
-                    </button>
-
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        @onclick="SaveNewProduct">
-                        Save Product
-                    </button>
-
-                </div>
-
+            <p><strong>Invoice Total: </strong> @GetInvoiceTotal.ToString("C", new
+                                System.Globalization.CultureInfo("en-US"))</p>
             </div>
-        </div>
-    }
-    @if (showClientModal)
-    {
-        <div class="modal-backdrop-custom">
-            <div class="custom-modal">
+            <div class="centered">
+                <button type="submit" class="btn btn-success" disabled="@(!isFormValid)">
+                    Save Invoice
+                </button>
 
-                <h4>Add Client</h4>
+                <button type="button" class="btn btn-custom ms-2" @onclick="Cancel">
+                    Cancel
+                </button>
+            </div>
 
-                <div class="mb-3">
-                    <label>Client Name</label>
-                    <InputText 
-                        class="form-control"
-                    @bind-Value="newClient.ClientName" />
-                </div>
+            <ValidationSummary />
+        </EditForm>
+        @if (showProductModal)
+        {
+            <div class="modal-backdrop-custom">
+                <div class="custom-modal">
 
-                <div class="mb-3">
-                    <label>Email</label>
-                    <InputText 
-                        class="form-control"
-                    @bind-Value="newClient.ClientEmail" />
-                </div>
+                    <h4>Add Product</h4>
 
-                <div class="mb-3">
-                    <label>Phone</label>
-                    <InputText 
-                        class="form-control"
-                    @bind-Value="newClient.ClientPhone" />
-                </div>
+                    @if (!string.IsNullOrWhiteSpace(productError))
+                    {
+                        <div class="alert alert-danger">
+                            @productError
+                        </div>
+                    }
 
-                <hr />
+                    <div class="mb-3">
+                        <label>Product Name</label>
 
-                <h6>Address</h6>
-
-                <div class="mb-3">
-                    <label>Street</label>
-                    <InputText 
-                        class="form-control"
-                        @bind-Value="newClient.ClientAddress" />
-                </div>
-
-                <div class="row">
-                    <div class="col">
-                        <label>City</label>
-                        <InputText 
-                            class="form-control"
-                            @bind-Value="newClient.ClientCity" />
+                        <InputText class="form-control" @bind-Value="newProduct.ProductName" />
                     </div>
 
-                    <div class="col">
-                        <label>State</label>
-                        <InputText 
-                            class="form-control"
-                        @bind-Value="newClient.ClientState" />
-                    </div>
-                </div>
+                    <div class="mb-3">
+                        <label>Price</label>
 
-                <div class="modal-buttons mt-3">
-                    <button type="button"
-                            class="btn btn-primary"
-                            @onclick="SaveNewClient">
-                        Save Client
-                    </button>
-                    <button type="button"
-                            class="btn btn-secondary"
-                            @onclick="CloseClientModal">
-                        Cancel
-                    </button>
+                        <InputNumber class="form-control" @bind-Value="newProduct.ProductPrice" />
+                    </div>
+
+                    <div class="modal-buttons">
+
+                        <button type="button" class="btn btn-secondary" @onclick="CloseProductModal">
+                            Cancel
+                        </button>
+
+                        <button type="button" class="btn btn-primary" @onclick="SaveNewProduct">
+                            Save Product
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+        }
+        @if (showClientModal)
+        {
+            <div class="modal-backdrop-custom">
+                <div class="custom-modal">
+
+                    <h4>Add Client</h4>
+
+                    <div class="mb-3">
+                        <label>Client Name</label>
+                        <InputText class="form-control" @bind-Value="newClient.ClientName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <InputText class="form-control" @bind-Value="newClient.ClientEmail" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Phone</label>
+                        <InputText class="form-control" @bind-Value="newClient.ClientPhone" />
+                    </div>
+
+                    <hr />
+
+                    <h6>Address</h6>
+
+                    <div class="mb-3">
+                        <label>Street</label>
+                        <InputText class="form-control" @bind-Value="newClient.ClientAddress" />
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label>City</label>
+                            <InputText class="form-control" @bind-Value="newClient.ClientCity" />
+                        </div>
+
+                        <div class="col">
+                            <label>State</label>
+                            <InputText class="form-control" @bind-Value="newClient.ClientState" />
+                        </div>
+                    </div>
+
+                    <div class="modal-buttons mt-3">
+                        <button type="button" class="btn btn-primary" @onclick="SaveNewClient">
+                            Save Client
+                        </button>
+                        <button type="button" class="btn btn-secondary" @onclick="CloseClientModal">
+                            Cancel
+                        </button>
 
                     
-                </div>
+                    </div>
 
+                </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
 
 @code {
 
@@ -251,26 +213,26 @@
     protected CreateInvoiceModel createInvoice = new();
     private CreateInvoiceLine? activeLine;
     private EditContext editContext;
-    private FormValidationHelper validator;   
-    private int? selectedClientId; 
+    private FormValidationHelper validator;
+    private int? selectedClientId;
     private Product newProduct = new()
-        {
-            ProductName = string.Empty
-        };
+    {
+        ProductName = string.Empty
+    };
     private Client newClient = new()
-        {
-            ClientName = "",
-            ClientPhone = ""
-        };
+    {
+        ClientName = "",
+        ClientPhone = ""
+    };
 
-    private readonly string[] requiredFields = 
+    private readonly string[] requiredFields =
         [
             nameof(createInvoice.ClientId),
             nameof(createInvoice.InvoiceDate),
             nameof(createInvoice.DueDate)
         ];
 
-    private bool isFormValid => 
+    private bool isFormValid =>
         !editContext.GetValidationMessages().Any() &&
         createInvoice.Lines.Count > 0 &&
         createInvoice.Lines.All(line => line.ProductId > 0 && line.Quantity > 0);
@@ -439,7 +401,7 @@
         if (activeLine is not null)
         {
             activeLine.ProductId = newProduct.ProductId;
-        }        
+        }
         showProductModal = false;
     }
     private async Task SaveNewClient()
@@ -471,5 +433,5 @@
             var product = products.FirstOrDefault(p => p.ProductId == line.ProductId);
             return line.Quantity * (product?.ProductPrice ?? 0);
         });
-    
+
 }
