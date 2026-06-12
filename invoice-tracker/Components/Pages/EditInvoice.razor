@@ -1,3 +1,4 @@
+@* Edit Invoice page *@
 @page "/invoices/edit/{id:int}"
 @rendermode InteractiveServer
 
@@ -12,11 +13,10 @@
 
 <ErrorBoundary>
     <ChildContent>
-
-
         <div class="page-content custom-form">
         <h1 class="pb-3">Edit Invoice</h1>
 
+        @* Client Information *@
         @if (invoice?.Client != null)
         {
             <div class="mb-3">
@@ -25,6 +25,7 @@
             </div>
         }
 
+        @* Invoice Details *@
         @if (invoice != null)
         {
             <EditForm Model="invoice" OnValidSubmit="UpdateInvoice" FormName="edit-invoice">
@@ -57,6 +58,7 @@
         </div>
     </ChildContent>
 
+    @* Error Content *@
     <ErrorContent Context="ex">
         <div class="alert alert-danger">
             <strong>Error:</strong> @ex.Message
@@ -68,9 +70,9 @@
 
     [Parameter]
     public int id { get; set; }
-
     Invoice? invoice;
 
+    // Load the invoice details on initialization
     protected override async Task OnInitializedAsync()
     {
         if (!UserSession.IsAuthenticated)
@@ -84,6 +86,7 @@
             .FirstOrDefaultAsync(i => i.InvoiceId == id);
     }
 
+    // Update the invoice details in the database
     async Task UpdateInvoice()
     {
         try
@@ -91,6 +94,7 @@
             var dbInvoice = await Context.Invoices
                 .FirstOrDefaultAsync(i => i.InvoiceId == id);
 
+            // If the invoice is not found, we can't update it
             if (dbInvoice == null)
                 return;
             dbInvoice.DueDate = DateTime.SpecifyKind(invoice!.DueDate, DateTimeKind.Utc);
@@ -113,6 +117,7 @@
         }
     }
 
+    // Navigate back to the invoice list without saving changes
     void Cancel()
     {
         Navigation.NavigateTo("/invoices");

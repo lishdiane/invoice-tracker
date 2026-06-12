@@ -1,3 +1,6 @@
+/* Navigation Menu Styles */
+
+/* Toggler Styles */
 .navbar-toggler {
   appearance: none;
   cursor: pointer;
@@ -16,6 +19,7 @@
   background-color: rgba(255, 255, 255, 0.5);
 }
 
+/* Navigation Menu */
 .top-row {
   min-height: 3.5rem;
   background-color: rgba(0, 0, 0, 0.4);
@@ -91,6 +95,7 @@
   display: block;
 }
 
+/* Responsive styles */
 @media (min-width: 710px) {
   .navbar-toggler {
     display: none;

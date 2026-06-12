@@ -1,3 +1,4 @@
+// Client.cs - Represents a client in the invoice tracking system, including properties for client details and relationships to users and invoices
 using System.ComponentModel.DataAnnotations;
 
 namespace InvoiceTracker

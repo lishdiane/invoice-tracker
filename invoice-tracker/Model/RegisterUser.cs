@@ -1,3 +1,4 @@
+// RegisterUser.cs - Model for user registration, including properties for user details and validation attributes to ensure proper input
 using System.ComponentModel.DataAnnotations;
 
 namespace InvoiceTracker

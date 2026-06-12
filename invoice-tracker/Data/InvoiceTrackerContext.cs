@@ -1,3 +1,4 @@
+// InvoiceTrackerContext.cs - Defines the Entity Framework Core database context for the Invoice Tracker application, including DbSet properties for each entity type (Client, Invoice, InvoiceProduct, Product, User).
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceTracker;

@@ -11,7 +11,7 @@
 
 <PageTitle>Account Details</PageTitle>
 
-
+  @* When the user is not logged in show a loading message *@
   @if (currentUser == null)
   {
     <p>Loading...</p>
@@ -19,8 +19,9 @@
   else
   {
     <div class="profile-card">
-<h1>Account Details</h1> <br />
 
+<h1>Account Details</h1> <br />
+      @* Display user details when not editing, otherwise show the edit form *@
       @if (!isEditing)
       {
       <p>
@@ -87,6 +88,8 @@
       <div>
         <br/>
         <h2>Change Password</h2>
+
+        @* Display password change message *@
         @if (!string.IsNullOrEmpty(passwordMessage))
         {
           <div class="alert alert-info">
@@ -133,6 +136,8 @@
   private bool isEditing = false;
   private readonly PasswordHasher<User> _passwordHasher = new();
 
+    // On component initialization, check if the user is authenticated. 
+    // If not, redirect to the login page. If authenticated, load the user's details.
   protected override async Task OnInitializedAsync()
   {
     if (!UserSession.IsAuthenticated)
@@ -142,17 +147,21 @@
     await LoadUser();
   }
 
+  // Load the current user's details from the database based on the UserSession's UserId
   private async Task LoadUser()
   {
     currentUser = await Db.Users
       .FirstOrDefaultAsync(u => u.UserId == UserSession.UserId);
   }
 
+  // Navigate to the edit account page 
+  //(not currently used since editing is done inline, but could be useful if we want a separate edit page in the future)
   private void EditAccount()
   {
     Navigation.NavigateTo("/edit-account");
   }
 
+  // Save the updated account details to the database and reload the user information
   private async Task UpdateAccount()
   {
     await Db.SaveChangesAsync();
@@ -160,6 +169,8 @@
     isEditing = false;
   }
 
+  // Change the user's password. 
+  // It first verifies that the current password is correct, and if so, hashes the new password and saves it to the database.
   private async Task ChangePassword()
   { 
     if (currentUser == null)

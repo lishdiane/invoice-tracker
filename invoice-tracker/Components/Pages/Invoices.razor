@@ -16,6 +16,7 @@
 }
 else
 {
+    @* Confirmation Modal for the delete invoice action *@
     @if (showConfirm)
     {
         <div class="alert alert-warning d-flex justify-content-between align-items-center">
@@ -33,13 +34,16 @@ else
         </div>
     }
 
-    <!-- Filters -->
+    @* Filter Section *@
     <div class="filter-section page-content filter-box">
         <div class="filters mb-3 d-flex flex-wrap gap-2 centered">
+
+            @* Search Filter *@
             <label for="search">Search by client name</label>
             <input type="text" id="search" class="form-control form-control-sm medium-form"
                    placeholder="Search by client name..." @bind="searchTerm" @bind:event="oninput" />
 
+            @* Status Filter *@
             <label for="status">Status</label>
             <select id="status" class="form-select form-select-sm short-form" @bind="statusFilter">
                 <option value="">All Statuses</option>
@@ -47,7 +51,7 @@ else
                 <option value="unpaid">Unpaid</option>
             </select>
 
-            <!-- date filter -->
+            @* Date Filters *@
             <div class=" d-flex flex-wrap gap-2">
                 <div class="date-group">
                     <label for="fromDate">From:</label>
@@ -59,6 +63,7 @@ else
                 </div>
             </div>
         </div>
+        @* Action Buttons *@
         <div class="d-flex gap-2 mb-3 centered">
             <button class="btn btn-custom btn-primary btn-sm" @onclick="ApplyFilters">
                 Apply Filters
@@ -69,16 +74,18 @@ else
         </div>
     </div>
 
-    <!-- RESPONSIVE TABLE WRAPPER -->
+    @* RESPONSIVE TABLE WRAPPER *@
     <div class="table-responsive">
         <div class="page-content">
             <table class="table align-middle custom-table">
-
+                @* Table Header *@
                 <thead>
                     <tr>
                         <th>ID</th>
+
                         <th>Client
                             <div class="dropdown d-inline">
+                                @* Client Sort Options *@
                                 <button class="btn p-0" data-bs-toggle="dropdown">
                                     ⇅
                                 </button>
@@ -96,8 +103,10 @@ else
                                 </ul>
                             </div>
                         </th>
+
                         <th>Date
                             <div class="dropdown d-inline">
+                                @* Date Sort Options *@
                                 <button class="btn p-0" data-bs-toggle="dropdown">
                                     ⇅
                                 </button>
@@ -115,8 +124,10 @@ else
                                 </ul>
                             </div>
                         </th>
+
                         <th>Due
                             <div class="dropdown d-inline">
+                                @* Due Date Sort Options *@
                                 <button class="btn p-0" data-bs-toggle="dropdown">
                                     ⇅
                                 </button>
@@ -134,9 +145,12 @@ else
                                 </ul>
                             </div>
                         </th>
+
                         <th>Status</th>
+
                         <th>Total
                             <div class="dropdown d-inline">
+                                @* Total Sort Options *@
                                 <button class="btn p-0" data-bs-toggle="dropdown">
                                     ⇅
                                 </button>
@@ -154,11 +168,13 @@ else
                                 </ul>
                             </div>
                         </th>
+
                         <th>Actions</th>
                     </tr>
                 </thead>
 
                 <tbody>
+                    @* Invoice Rows *@
                     @foreach (var invoice in invoices)
                     {
                         <tr>
@@ -184,9 +200,8 @@ else
                             </td>
 
                             <td>
-                                <!-- Better mobile button layout -->
+                                @* Better mobile button layout *@
                                 <div class="d-flex flex-wrap gap-1">
-
                                     <button type="button" class="btn btn-custom btn-sm"
                                             @onclick="() => EditInvoice(invoice.InvoiceId)">
                                         Edit
@@ -196,7 +211,6 @@ else
                                             @onclick="() => ShowConfirm(invoice.InvoiceId)">
                                         Delete
                                     </button>
-
                                 </div>
                             </td>
                         </tr>
@@ -207,6 +221,7 @@ else
         </div>
     </div>
 
+    @* Invoice Cards *@
     <div class="invoice-cards page-content">
         @foreach (var invoice in invoices)
         {
@@ -245,6 +260,7 @@ else
     int? deleteId;
     bool showConfirm = false;
 
+    // Method to navigate to the login page
     protected override async Task OnInitializedAsync()
     {
         // Redirect to login if not authenticated
@@ -261,28 +277,33 @@ else
             .ToListAsync();
     }
 
+    // Method to calculate total amount for an invoice
     decimal GetTotal(Invoice invoice)
     {
         return invoice.InvoiceProducts.Sum(p => p.Quantity * p.Price);
     }
 
+    // Method to navigate to the edit invoice page
     void EditInvoice(int id)
     {
         Navigation.NavigateTo($"/invoices/edit/{id}");
     }
 
+    // Method to show confirmation modal for deleting an invoice
     void ShowConfirm(int id)
     {
         deleteId = id;
         showConfirm = true;
     }
 
+    // Method to cancel the delete action and hide the confirmation modal
     void CancelDelete()
     {
         deleteId = null;
         showConfirm = false;
     }
 
+    // Method to confirm deletion of an invoice, remove it from the database, and update the UI
     async Task ConfirmDelete()
     {
         if (deleteId == null)
@@ -307,6 +328,8 @@ else
     string statusFilter = "";
     DateTime? fromDate = null;
     DateTime? toDate = null;
+
+    // Method to apply filters to the invoice list based on search term, status, and date range
     void ApplyFilters()
     {
         var query = Context.Invoices
@@ -315,6 +338,7 @@ else
             .Where(i => UserSession.UserId == i.UserId)
             .AsQueryable();
 
+        // Search filter using case-insensitive matching
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             query = query.Where(i => EF.Functions.ILike(i.Client.ClientName, $"%{searchTerm}%"));
@@ -350,6 +374,7 @@ else
         invoices = query.ToList();
     }
 
+    // Method to clear all filters
     void ClearFilters()
     {
         searchTerm = "";
@@ -391,5 +416,4 @@ else
         }
     }
 
-    
 }

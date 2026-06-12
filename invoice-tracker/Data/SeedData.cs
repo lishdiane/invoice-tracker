@@ -1,3 +1,4 @@
+// SeedData.cs - Initializes the database with sample data for users, clients, products, invoices, and invoice products
 using InvoiceTracker;
 using Microsoft.EntityFrameworkCore;
 

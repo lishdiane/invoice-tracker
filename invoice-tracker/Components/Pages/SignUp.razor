@@ -15,12 +15,14 @@
 <div class="profile-card">
   <h1>Create Account</h1>
 
+  @* Create Account Form *@
   <EditForm 
     EditContext="editContext" 
     OnValidSubmit="HandleSignUp" 
     FormName="SignUpForm">
     <DataAnnotationsValidator />
 
+    @* Error Message *@
     @if (!string.IsNullOrEmpty(errorMessage))
     {
       <div class="alert alert-danger">
@@ -28,6 +30,7 @@
       </div>
     }
 
+    @* Account Information *@
     <fieldset>
       <legend>Account Information</legend>
       <div class="form-group mb-3">
@@ -61,6 +64,7 @@
       </div>
     </fieldset>
 
+    @* Company Information *@
     <fieldset>
       <legend>Company Information</legend>
       <div class="form-group mb-3">
@@ -81,7 +85,6 @@
           @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyEmail)))" />
         <ValidationMessage For="@(() => registerUser.CompanyEmail)" />
       </div>
-
       <div class="form-group mb-3">
         <label for="companyPhone">Company Phone</label>
         <InputText 
@@ -93,6 +96,7 @@
       </div>
     </fieldset>
 
+    @* Company Address *@
     <fieldset>
       <legend>Company Address</legend>
 
@@ -105,7 +109,6 @@
           @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyAddress)))" />
         <ValidationMessage For="@(() => registerUser.CompanyAddress)" />
       </div>
-
       <div class="form-group mb-3">
         <label for="companyCity">City</label>
         <InputText 
@@ -115,7 +118,6 @@
           @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyCity)))" />
         <ValidationMessage For="@(() => registerUser.CompanyCity)" />
       </div>
-
       <div class="form-group mb-3">
         <label for="companyState">State</label>
         <InputText 
@@ -127,6 +129,7 @@
       </div>
     </fieldset>
 
+    @* Create Account Button *@
     <button 
       type="submit" 
       class="btn btn-primary btn-centered" 
@@ -159,6 +162,7 @@
     nameof(registerUser.CompanyPhone)
   ];
 
+  // Redirect to home if already authenticated
   protected override void OnInitialized()
   {
     if (UserSession.IsAuthenticated)
@@ -169,6 +173,8 @@
     editContext = new EditContext(registerUser);
     validator = new FormValidationHelper(editContext, requiredFields);
   }
+
+  // Handle the sign-up process
   private async Task HandleSignUp()
   {
     errorMessage = "";
