@@ -10,26 +10,53 @@
 
 <h1>Invoices</h1>
 
-@if (invoices == null)
+@* Confirmation Message after invoice deletion *@
+    @if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success">
+        @successMessage
+    </div>
+}
+
+@if (isLoading)
 {
     <p>Loading...</p>
+}
+else if (invoices == null)
+{
+    <div class="alert alert-danger">
+        No Invoices Found.
+    </div>
 }
 else
 {
     @* Confirmation Modal for the delete invoice action *@
     @if (showConfirm)
     {
-        <div class="alert alert-warning d-flex justify-content-between align-items-center">
-            <span>Are you sure you want to delete this invoice?</span>
+        <div class="modal-backdrop-custom">
+            <div class="custom-modal">
+                @if (!showSuccess)
+                {
+                    <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                        <span>Are you sure you want to delete this invoice?</span>
 
-            <div class="d-flex gap-2">
-                <button class="btn btn-danger btn-sm" @onclick="ConfirmDelete">
-                    Yes
-                </button>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-danger btn-sm" @onclick="ConfirmDelete">
+                                Yes
+                            </button>
 
-                <button class="btn btn-secondary btn-sm" @onclick="CancelDelete">
-                    No
-                </button>
+                            <button class="btn btn-secondary btn-sm" @onclick="CancelDelete">
+                                No
+                            </button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-success">
+                        @successMessage
+                    </div>
+                }
             </div>
         </div>
     }
@@ -229,7 +256,7 @@ else
                 <div class="invoice-header">
                     <div>
                         <span class="invoice-number">#@invoice.InvoiceId</span>
-                        <span> @invoice.Client.ClientName</span>
+                        <a href="/invoices/view/@invoice.InvoiceId"> @invoice.Client.ClientName</a>
                     </div>
                     <span class="invoice-status @(invoice.IsPaid ? "paid" : "unpaid")">
                         @(invoice.IsPaid ? "Paid" : "Unpaid")
@@ -260,6 +287,10 @@ else
     int? deleteId;
     bool showConfirm = false;
 
+    bool showSuccess = false;
+    string successMessage = "";
+    bool isLoading = true;
+
     // Method to navigate to the login page
     protected override async Task OnInitializedAsync()
     {
@@ -270,11 +301,21 @@ else
             return;
         }
 
+        var uri = new Uri(Navigation.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+
+        if (query["message"] == "delete")
+        {
+            successMessage = "Invoice deleted successfully.";
+        }
+
         invoices = await Context.Invoices
             .Include(i => i.Client)
             .Include(i => i.InvoiceProducts)
             .Where(i => UserSession.UserId == i.UserId)
             .ToListAsync();
+
+        isLoading = false;
     }
 
     // Method to calculate total amount for an invoice
@@ -317,10 +358,16 @@ else
             await Context.SaveChangesAsync();
 
             invoices?.RemoveAll(i => i.InvoiceId == deleteId.Value);
-        }
 
-        deleteId = null;
-        showConfirm = false;
+            successMessage = $"Invoice #{deleteId.Value} deleted successfully.";
+            showSuccess = true;
+
+            StateHasChanged();
+
+            await Task.Delay(2000);
+            showSuccess = false;
+            showConfirm = false;
+        }
     }
 
     // Filter state
