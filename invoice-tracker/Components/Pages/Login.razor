@@ -32,8 +32,6 @@
     @* Login Form *@
     <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" FormName="login-form">
         <DataAnnotationsValidator />
-        <ValidationSummary />
-    
         <div class="form-group mb-3">
             <label for="username" class="form-label">Username</label>
             <InputText id="username" class="form-control" @bind-Value="loginModel.Username" />
@@ -43,12 +41,13 @@
             <label for="password" class="form-label">Password</label>
             <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" />
         </div>
-    
+        <ValidationSummary />    
         <button type="submit" class="btn btn-primary btn-centered">Login</button>
     
         <div class="centered">
             <p>Don't have an account? <a href="/signup">Sign up</a></p>
         </div>
+
     </EditForm>
 </div>
 
