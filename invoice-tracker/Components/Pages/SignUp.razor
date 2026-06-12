@@ -15,10 +15,7 @@
 <div class="profile-card">
   <h1>Create Account</h1>
 
-  <EditForm 
-    EditContext="editContext" 
-    OnValidSubmit="HandleSignUp" 
-    FormName="SignUpForm">
+  <EditForm EditContext="editContext" OnValidSubmit="HandleSignUp" FormName="SignUpForm">
     <DataAnnotationsValidator />
 
     @if (!string.IsNullOrEmpty(errorMessage))
@@ -32,31 +29,24 @@
       <legend>Account Information</legend>
       <div class="form-group mb-3">
         <label for="username">Username</label>
-        <InputText 
-          id="username" 
-          class="@validator.GetFieldCssClass(nameof(registerUser.Username))" 
-          @bind-Value="registerUser.Username" 
-          @onblur="@(_ => validator.ValidateField(nameof(registerUser.Username)))" />
+        <InputText id="username" class="@validator.GetFieldCssClass(nameof(registerUser.Username))"
+                   @bind-Value="registerUser.Username"
+                   @onblur="@(_ => validator.ValidateField(nameof(registerUser.Username)))" />
         <ValidationMessage For="@(() => registerUser.Username)" />
       </div>
       <div class="form-group mb-3">
         <label for="password">Password</label>
-        <InputText 
-          id="password" 
-          type="password" 
-          class="@validator.GetFieldCssClass(nameof(registerUser.Password))" 
-          @bind-Value="registerUser.Password" 
-          @onblur="@(_ => validator.ValidateField(nameof(registerUser.Password)))" />
+        <InputText id="password" type="password" class="@validator.GetFieldCssClass(nameof(registerUser.Password))"
+                   @bind-Value="registerUser.Password"
+                   @onblur="@(_ => validator.ValidateField(nameof(registerUser.Password)))" />
         <ValidationMessage For="@(() => registerUser.Password)" />
       </div>
       <div class="form-group mb-3">
         <label for="confirmPassword">Confirm Password</label>
-        <InputText 
-          id="confirmPassword" 
-          type="password" 
-          class="@validator.GetFieldCssClass(nameof(registerUser.ConfirmPassword))" 
-          @bind-Value="registerUser.ConfirmPassword"
-          @onblur="@(_ => validator.ValidateField(nameof(registerUser.ConfirmPassword)))" />
+        <InputText id="confirmPassword" type="password"
+                   class="@validator.GetFieldCssClass(nameof(registerUser.ConfirmPassword))"
+                   @bind-Value="registerUser.ConfirmPassword"
+                   @onblur="@(_ => validator.ValidateField(nameof(registerUser.ConfirmPassword)))" />
         <ValidationMessage For="@(() => registerUser.ConfirmPassword)" />
       </div>
     </fieldset>
@@ -65,30 +55,24 @@
       <legend>Company Information</legend>
       <div class="form-group mb-3">
         <label for="companyName">Company Name</label>
-        <InputText 
-          id="companyName" 
-          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyName))" 
-          @bind-Value="registerUser.CompanyName" 
-          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyName)))" />
+        <InputText id="companyName" class="@validator.GetFieldCssClass(nameof(registerUser.CompanyName))"
+                   @bind-Value="registerUser.CompanyName"
+                   @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyName)))" />
         <ValidationMessage For="@(() => registerUser.CompanyName)" />
       </div>
       <div class="form-group mb-3">
         <label for="companyEmail">Company Email</label>
-        <InputText 
-          id="companyEmail" 
-          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyEmail))" 
-          @bind-Value="registerUser.CompanyEmail" 
-          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyEmail)))" />
+        <InputText id="companyEmail" class="@validator.GetFieldCssClass(nameof(registerUser.CompanyEmail))"
+                   @bind-Value="registerUser.CompanyEmail"
+                   @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyEmail)))" />
         <ValidationMessage For="@(() => registerUser.CompanyEmail)" />
       </div>
 
       <div class="form-group mb-3">
         <label for="companyPhone">Company Phone</label>
-        <InputText 
-          id="companyPhone" 
-          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyPhone))" 
-          @bind-Value="registerUser.CompanyPhone" 
-          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyPhone)))" />
+        <InputText id="companyPhone" class="@validator.GetFieldCssClass(nameof(registerUser.CompanyPhone))"
+                   @bind-Value="registerUser.CompanyPhone"
+                   @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyPhone)))" />
         <ValidationMessage For="@(() => registerUser.CompanyPhone)" />
       </div>
     </fieldset>
@@ -98,39 +82,30 @@
 
       <div class="form-group mb-3">
         <label for="companyAddress">Street Address</label>
-        <InputText 
-          id="companyAddress" 
-          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyAddress))" 
-          @bind-Value="registerUser.CompanyAddress" 
-          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyAddress)))" />
+        <InputText id="companyAddress" class="@validator.GetFieldCssClass(nameof(registerUser.CompanyAddress))"
+                   @bind-Value="registerUser.CompanyAddress"
+                   @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyAddress)))" />
         <ValidationMessage For="@(() => registerUser.CompanyAddress)" />
       </div>
 
       <div class="form-group mb-3">
         <label for="companyCity">City</label>
-        <InputText 
-          id="companyCity" 
-          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyCity))" 
-          @bind-Value="registerUser.CompanyCity" 
-          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyCity)))" />
+        <InputText id="companyCity" class="@validator.GetFieldCssClass(nameof(registerUser.CompanyCity))"
+                   @bind-Value="registerUser.CompanyCity"
+                   @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyCity)))" />
         <ValidationMessage For="@(() => registerUser.CompanyCity)" />
       </div>
 
       <div class="form-group mb-3">
         <label for="companyState">State</label>
-        <InputText 
-          id="companyState" 
-          class="@validator.GetFieldCssClass(nameof(registerUser.CompanyState))" 
-          @bind-Value="registerUser.CompanyState" 
-          @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyState)))" />
+        <InputText id="companyState" class="@validator.GetFieldCssClass(nameof(registerUser.CompanyState))"
+                   @bind-Value="registerUser.CompanyState"
+                   @onblur="@(_ => validator.ValidateField(nameof(registerUser.CompanyState)))" />
         <ValidationMessage For="@(() => registerUser.CompanyState)" />
       </div>
     </fieldset>
 
-    <button 
-      type="submit" 
-      class="btn btn-primary btn-centered" 
-      disabled="@(!isFormValid)">
+    <button type="submit" class="btn btn-primary btn-centered" disabled="@(!isFormValid)">
       Create Account
     </button>
     <ValidationSummary />
@@ -172,20 +147,19 @@
   private async Task HandleSignUp()
   {
     errorMessage = "";
-
-    @* Code below requires DB connection *@
-    var existingUser = await Db.Users
-        .FirstOrDefaultAsync(
-            u => u.Username == registerUser.Username);
-
-    if (existingUser != null)
-    {
-      errorMessage = "Username already exists.";
-      return;
-    }
-
     try
     {
+      @* Code below requires DB connection *@
+      var existingUser = await Db.Users
+          .FirstOrDefaultAsync(
+              u => u.Username == registerUser.Username);
+
+      if (existingUser != null)
+      {
+        errorMessage = "Username already exists.";
+        return;
+      }
+
       var user = new User
       {
         Username = registerUser.Username,
@@ -219,7 +193,8 @@
     }
     catch (Exception ex)
     {
-      errorMessage = $"Database Error: {ex.Message}";
+      errorMessage = $"An error occurred. Please try again.";
+      Console.WriteLine($"Signup error: {ex.Message}");
     }
   }
 }

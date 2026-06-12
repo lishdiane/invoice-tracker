@@ -68,33 +68,41 @@
     {
         errorMessage = "";
 
-        var user = await DbContext.Users
-            .FirstOrDefaultAsync(u =>
-                u.Username == loginModel.Username);
-
-        if (user == null)
+        try
         {
-            errorMessage = "Invalid username or password";
-            return;
+            var user = await DbContext.Users
+                .FirstOrDefaultAsync(u =>
+                    u.Username == loginModel.Username);
+
+            if (user == null)
+            {
+                errorMessage = "Invalid username or password";
+                return;
+            }
+
+            var result = _passwordHasher.VerifyHashedPassword(
+                user,
+                user.Password,
+                loginModel.Password);
+
+            if (result == PasswordVerificationResult.Success)
+            {
+                UserSession.IsAuthenticated = true;
+                UserSession.UserId = user.UserId;
+                UserSession.Username = user.Username;
+
+                Navigation.NavigateTo("/dashboard");
+            }
+            else
+            {
+                errorMessage = "Invalid username or password";
+            }
+
         }
-
-        var result = _passwordHasher.VerifyHashedPassword(
-            user,
-            user.Password,
-            loginModel.Password);
-
-        if (result == PasswordVerificationResult.Success)
+        catch (Exception ex)
         {
-            UserSession.IsAuthenticated = true;
-            UserSession.UserId = user.UserId;
-            UserSession.Username = user.Username;
-
-            Navigation.NavigateTo("/dashboard");
-        }
-        else
-        {
-            errorMessage = "Invalid username or password";
+            errorMessage = "An error occurred. Please try again.";
+            Console.WriteLine($"Login error: {ex.Message}");
         }
     }
-
 }
