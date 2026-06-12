@@ -1,3 +1,4 @@
+@* Dashboard page *@
 @page "/dashboard"
 
 @using Microsoft.EntityFrameworkCore
@@ -13,6 +14,7 @@
 
 <div class="row g-1 dashboard-summary-cards">
 
+    @* Total Invoices Card *@
     <div class="col-12 col-sm-6 col-lg-3 summary-card">
         <div class="card">
             <div class="card-body text-center">
@@ -21,7 +23,8 @@
             </div>
         </div>
     </div>
-    
+
+    @* Paid Invoices Card *@
     <div class="col-12 col-sm-6 col-lg-3 summary-card">
         <div class="card">
             <div class="card-body text-center">
@@ -31,6 +34,7 @@
         </div>
     </div>
 
+    @* Unpaid Invoices Card *@
     <div class="col-12 col-sm-6 col-lg-3 summary-card">
         <div class="card">
             <div class="card-body text-center">
@@ -39,13 +43,13 @@
             </div>
         </div>
     </div>
-
 </div>
 
 <hr />
 
 <h4>Upcoming Invoices</h4>
 
+@* Upcoming Invoices Table *@
 <div class="table-responsive">
     <div class="page-content">
     <table class="table custom-table align-middle">
@@ -59,6 +63,7 @@
             </tr>
         </thead>
 
+        @* Upcoming Invoices Rows *@
         <tbody>
             @foreach (var invoice in invoices)
             {
@@ -88,6 +93,7 @@
     </div>
 </div>
 
+@* Invoice Cards *@
 <div class="invoice-cards page-content">
     @foreach (var invoice in invoices)
     {
@@ -123,6 +129,8 @@
 
     List<Invoice> invoices = new();
 
+    // On component initialization, we check if the user is authenticated. 
+    // Then load the invoice data for the dashboard, including total counts and upcoming invoices.
     protected override async Task OnInitializedAsync()
     {
         // Redirect to login if not authenticated
@@ -132,6 +140,7 @@
             return;
         }
 
+        // Load dashboard data
         totalInvoices =
             await Context.Invoices
             .Where(i => UserSession.UserId == i.UserId)

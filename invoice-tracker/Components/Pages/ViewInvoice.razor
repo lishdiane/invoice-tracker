@@ -20,7 +20,9 @@
 else
 {
     <div class="card page-content invoice-details">
-<h1>Invoice Details</h1>
+        <h1>Invoice Details</h1>
+
+        @* Invoice Information *@
         <div>
             <h2 class="pt-3">Invoice #@invoice.InvoiceId</h2>
             <div class="page-content">
@@ -48,8 +50,9 @@ else
                 </p>
             </div>
 
+            @* Product List *@
             @if (invoice.InvoiceProducts != null &&
-      invoice.InvoiceProducts.Any())
+                invoice.InvoiceProducts.Any())
             {
                 <h2 class="pt-3">Products</h2>
                 <div class="page-content">
@@ -87,10 +90,11 @@ else
                 <p>No products found.</p>
             }
 
+            @* Action Buttons *@
+
             <button class="btn btn-success me-2" @onclick="DownloadInvoice">
                 Download Invoice
             </button>
-
             <button class="btn btn-custom" @onclick="BackToList">
                 Back
             </button>
@@ -106,6 +110,7 @@ else
 
     Invoice? invoice;
 
+    //Method to initialize the component and load the invoice details
     protected override async Task OnInitializedAsync()
     {
         if (!UserSession.IsAuthenticated)
@@ -118,6 +123,7 @@ else
             .FirstOrDefaultAsync(i => i.InvoiceId == id);
     }
 
+    // Generate a simple text representation of the invoice and trigger a download
     async Task DownloadInvoice()
     {
         if (invoice == null)
@@ -136,6 +142,7 @@ else
         content.AppendLine("Products");
         content.AppendLine("----------------------------------");
 
+        // List each product with quantity and price
         foreach (var item in invoice.InvoiceProducts)
         {
             content.AppendLine(
@@ -152,12 +159,14 @@ else
         var bytes = Encoding.UTF8.GetBytes(content.ToString());
         var base64 = Convert.ToBase64String(bytes);
 
+        // Use JS interop to trigger the file download
         await JS.InvokeVoidAsync(
             "downloadFile",
             $"Invoice-{invoice.InvoiceId}.txt",
             base64);
     }
 
+    // Navigate back to the invoice list
     void BackToList()
     {
         Navigation.NavigateTo("/dashboard");

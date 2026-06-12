@@ -1,4 +1,4 @@
-
+// User session management class to track authentication status and user information
 namespace InvoiceTracker;
 
 public class UserSession

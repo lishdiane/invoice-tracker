@@ -1,3 +1,4 @@
+/* App Styles */
 html,
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -212,7 +213,6 @@ table .btn-custom {
 }
 
 .filter-section {
-  /* background-color: #fbfaf7; */
   padding-top: 20px;
   padding-bottom: 10px;
 }
@@ -261,7 +261,7 @@ table .btn-custom {
   background-color: #f1efe8;
 }
 
-
+/* Mobile Styles */
 @media (max-width: 1030px) {
   /* Hide table on mobile */
   .table-responsive {

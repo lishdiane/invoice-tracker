@@ -8,6 +8,7 @@ retryButton.addEventListener("click", retry);
 const resumeButton = document.getElementById("components-resume-button");
 resumeButton.addEventListener("click", resume);
 
+// When the reconnect state changes, show or hide the modal as appropriate.
 function handleReconnectStateChanged(event) {
     if (event.detail.state === "show") {
         reconnectModal.showModal();
@@ -20,6 +21,8 @@ function handleReconnectStateChanged(event) {
     }
 }
 
+// When the user clicks the "Retry" button, attempt to reconnect immediately. 
+// If it fails, we'll show the failure message and let the user decide whether to retry again or reload.
 async function retry() {
     document.removeEventListener("visibilitychange", retryWhenDocumentBecomesVisible);
 
@@ -45,6 +48,8 @@ async function retry() {
     }
 }
 
+// The "Resume" button is only shown when the server has explicitly paused the circuit, which means that we should be able to resume without needing to retry first. 
+// If resuming fails, then we'll show the failure message and let the user decide whether to retry or reload.
 async function resume() {
     try {
         const successful = await Blazor.resumeCircuit();
@@ -56,6 +61,8 @@ async function resume() {
     }
 }
 
+// When the document becomes visible again, attempt to retry the connection immediately. 
+// This covers the common scenario where the user switches back to a tab after some time away, and the server has become available again in the meantime.
 async function retryWhenDocumentBecomesVisible() {
     if (document.visibilityState === "visible") {
         await retry();
