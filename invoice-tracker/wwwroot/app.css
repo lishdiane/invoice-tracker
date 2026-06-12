@@ -15,10 +15,6 @@ a,
   border-color: #1861ac;
 }
 
-/* .btn-secondary {
-    color: 
-} */
-
 .btn:focus,
 .btn:active:focus,
 .btn-link.nav-link:focus,
@@ -38,6 +34,14 @@ h3 {
 
 h1:focus {
   outline: none;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
 }
 
 .valid.modified:not([type="checkbox"]) {
@@ -99,6 +103,8 @@ h1:focus {
   font-weight: 600;
   font-size: 12px;
   width: 100%;
+  max-width: 75px;
+
 }
 
 .badge-red,
@@ -110,13 +116,14 @@ h1:focus {
   font-weight: 600;
   font-size: 12px;
   width: 100%;
+  max-width: 75px;
 }
 
 .btn-custom {
   background-color: #f1efe8;
   color: black;
-  width: 100%;
-  max-width: 150px;
+    min-width: fit-content;
+    max-width: 150px;
   border: 0;
   box-shadow: 0 0 0.1rem 0.5px rgba(0, 0, 0, 0.312);
 }
@@ -125,7 +132,15 @@ h1:focus {
   background-color: rgba(0, 0, 0, 0.308);
 }
 .btn-success {
-  background-color: #1D9E75 ;
+    background-color: #e1f5ee;
+    color: black;
+    min-width: fit-content;
+    max-width: 150px;
+}
+
+table .btn-custom {
+  width: 100%;
+  max-width: none;
 }
 
 .custom-table tbody tr {
@@ -146,13 +161,15 @@ h1:focus {
   background-color: #fbfaf7;
 }
 
-.create-form {
-  max-width: 600px;
+.custom-form {
+  max-width: 700px;
   width: 90%;
-  margin: 0 auto;
+  margin: 2rem auto;
+  padding: 2rem;
 
   select {
     appearance: auto;
+    height: 38px;
   }
 }
 
@@ -222,6 +239,29 @@ h1:focus {
   margin-top: 1rem;
 }
 
+.dashboard-summary-cards {
+  justify-content: space-evenly;
+
+  h2 {
+    font-size: 1.3rem;
+    padding: 0rem;
+  }
+
+  h3 {
+    padding: 0rem;
+    font-size: 1.5rem;
+  }
+
+  .summary-card {
+    min-width: 200px;
+  }
+}
+
+.form-control:disabled {
+  background-color: #f1efe8;
+}
+
+
 @media (max-width: 1030px) {
   /* Hide table on mobile */
   .table-responsive {
@@ -259,13 +299,17 @@ h1:focus {
 
   .invoice-body {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
   }
 
   .invoice-body div {
     margin: 0.25rem 0;
     display: flex;
     flex-direction: column;
+  }
+
+  .dashboard-invoice-body div{
+    display: inline;
   }
 
   .invoice-actions {
@@ -300,7 +344,7 @@ h1:focus {
   font-size: 0.9rem;
 }
 
-.profile-card {
+.profile-card, .invoice-details {
   max-width: 700px;
   margin: 2rem auto;
   padding: 1.5rem;

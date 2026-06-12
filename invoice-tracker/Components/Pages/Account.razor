@@ -44,7 +44,7 @@
         @currentUser.CompanyCity, @currentUser.CompanyState
       </p>
 
-      <button class="btn btn-primary btn-centered" @onclick="(() => isEditing = true)">
+      <button class="btn btn-success" @onclick="(() => isEditing = true)">
         Edit Account
       </button>
       } 
@@ -79,7 +79,7 @@
             </div>
         </div>
 
-        <button class="btn btn-primary btn-centered" @onclick="UpdateAccount">
+        <button class="btn btn-success" @onclick="UpdateAccount">
             Save Changes
         </button>
       </EditForm>
@@ -116,7 +116,7 @@
             <ValidationMessage For="@(() => changePassword.ConfirmPassword)" />
           </div>
 
-          <button type="submit" class="btn btn-warning btn-centered">
+          <button type="submit" class="btn btn-warning">
             Change Password
           </button>
         </EditForm>

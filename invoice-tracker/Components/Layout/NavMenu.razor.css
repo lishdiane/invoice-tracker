@@ -75,6 +75,7 @@
 .nav-item ::deep a.active {
   background-color: #1d9e75;
   color: black;
+  font-weight: 600;
 }
 
 .nav-item ::deep .nav-link:hover {

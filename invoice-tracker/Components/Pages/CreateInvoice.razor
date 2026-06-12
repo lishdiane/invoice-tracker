@@ -8,9 +8,10 @@
 <PageTitle>Create Invoice</PageTitle>
 
 
-<h1 class="centered">Create Invoice</h1>
+
 
 <div class="page-content create-form">
+  <h1 class="pb-3">Create Invoice</h1>
     <EditForm 
         EditContext="editContext" 
         OnValidSubmit="SaveInvoice" 
@@ -104,9 +105,13 @@
         <div class="invoice-total">
             <p><strong>Invoice Total: </strong> @GetInvoiceTotal.ToString("C")</p>
         </div>
-        <div>
-            <button type="submit" class="btn btn-custom btn-primary" disabled="@(!isFormValid)">
+        <div class="centered">
+            <button type="submit" class="btn btn-success" disabled="@(!isFormValid)">
                 Save Invoice
+            </button>
+
+            <button type="button" class="btn btn-custom ms-2" @onclick="Cancel">
+                Cancel
             </button>
         </div>
         
@@ -350,6 +355,10 @@
         Navigation.NavigateTo("/invoices");
     }
 
+    void Cancel()
+    {
+        Navigation.NavigateTo("/invoices");
+    }
     private void AddProduct()
     {
         createInvoice.Lines.Add(new CreateInvoiceLine());

@@ -11,9 +11,9 @@
 
 <h1>Dashboard</h1>
 
-<div class="row g-3">
+<div class="row g-1 dashboard-summary-cards">
 
-    <div class="col-12 col-sm-6 col-lg-3">
+    <div class="col-12 col-sm-6 col-lg-3 summary-card">
         <div class="card">
             <div class="card-body text-center">
                 <h2>Total Invoices</h2>
@@ -21,8 +21,8 @@
             </div>
         </div>
     </div>
-
-    <div class="col-12 col-sm-6 col-lg-3">
+    
+    <div class="col-12 col-sm-6 col-lg-3 summary-card">
         <div class="card">
             <div class="card-body text-center">
                 <h2>Paid</h2>
@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <div class="col-12 col-sm-6 col-lg-3">
+    <div class="col-12 col-sm-6 col-lg-3 summary-card">
         <div class="card">
             <div class="card-body text-center">
                 <h2>Unpaid</h2>
@@ -44,14 +44,16 @@
 
 <hr />
 
-<h4>Invoices</h4>
+<h4>Upcoming Invoices</h4>
 
 <div class="table-responsive">
-    <table class="table table-striped table-hover align-middle">
+    <div class="page-content">
+    <table class="table custom-table align-middle">
         <thead>
             <tr>
                 <th>Invoice ID</th>
                 <th>Client</th>
+                <th>Due Date</th>
                 <th>Status</th>
                 <th>Details</th>
             </tr>
@@ -61,11 +63,21 @@
             @foreach (var invoice in invoices)
             {
                 <tr>
-                    <td>@invoice.InvoiceId</td>
+                    <td>#@invoice.InvoiceId</td>
                     <td>@invoice.Client?.ClientName</td>
-                    <td>@(invoice.IsPaid ? "Paid" : "Unpaid")</td>
-                    <td class="text-end">
-                        <a class="btn btn-info btn-sm" href="/invoices/view/@invoice.InvoiceId">
+                    <td>@invoice.DueDate.ToShortDateString()</td>
+                        <td>
+                            @if (invoice.IsPaid)
+                            {
+                                <span class="badge badge-green">Paid</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-red">Unpaid</span>
+                            }
+                        </td>
+                        <td>
+                        <a class="btn btn-custom btn-info btn-sm" href="/invoices/view/@invoice.InvoiceId">
                             View
                         </a>
                     </td>
@@ -73,7 +85,35 @@
             }
         </tbody>
     </table>
+    </div>
 </div>
+
+<div class="invoice-cards page-content">
+    @foreach (var invoice in invoices)
+    {
+        <div class="invoice-card">
+            <div class="invoice-header">
+                <div>
+                    <span class="invoice-number">#@invoice.InvoiceId</span>
+                    <span> @invoice.Client.ClientName</span>
+                </div>
+                <span class="invoice-status @(invoice.IsPaid ? "paid" : "unpaid")">
+                    @(invoice.IsPaid ? "Paid" : "Unpaid")
+                </span>
+            </div>
+
+            <div class="invoice-body dashboard-invoice-body">
+                <div>Date: <span>@invoice.InvoiceDate.ToShortDateString()</span></div>
+                <div>Due: <span>@invoice.DueDate.ToShortDateString()</span></div>
+            </div>
+            <div class="line"></div>
+            <div class="invoice-actions">
+                <a class="btn btn-custom" href="/invoices/view/@invoice.InvoiceId">Details</a>
+            </div>
+        </div>
+    }
+</div>
+
 
 @code {
 
@@ -93,17 +133,25 @@
         }
 
         totalInvoices =
-            await Context.Invoices.CountAsync();
+            await Context.Invoices
+            .Where(i => UserSession.UserId == i.UserId)
+            .CountAsync();
 
         paidInvoices =
-            await Context.Invoices.CountAsync(i => i.IsPaid);
+            await Context.Invoices
+            .Where(i => UserSession.UserId == i.UserId)
+            .CountAsync(i => i.IsPaid);
 
         unpaidInvoices =
-            await Context.Invoices.CountAsync(i => !i.IsPaid);
+            await Context.Invoices
+            .Where(i => UserSession.UserId == i.UserId)
+            .CountAsync(i => !i.IsPaid);
 
         invoices = await Context.Invoices
             .Include(i => i.Client)
-            .Where(i => UserSession.UserId == i.UserId)
+            .Where(i => UserSession.UserId == i.UserId && !i.IsPaid)
+            .OrderBy(i => i.DueDate)
+            .Take(5)
             .ToListAsync();
     }
 }
