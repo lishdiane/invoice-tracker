@@ -58,7 +58,7 @@
     private string errorMessage = "";
     private string? successMessage;
     private readonly PasswordHasher<User> _passwordHasher = new();
-    
+
     // Check for logout message in query string to display success message
     protected override void OnInitialized()
     {
@@ -82,12 +82,12 @@
                 .FirstOrDefaultAsync(u =>
                     u.Username == loginModel.Username);
 
-        if (user == null)
-        {
-            errorMessage = "Invalid username or password";
-            successMessage = null;
-            return;
-        }
+            if (user == null)
+            {
+                errorMessage = "Invalid username or password";
+                successMessage = null;
+                return;
+            }
 
             var result = _passwordHasher.VerifyHashedPassword(
                 user,
@@ -100,12 +100,17 @@
                 UserSession.UserId = user.UserId;
                 UserSession.Username = user.Username;
 
-            Navigation.NavigateTo("/dashboard");
+                Navigation.NavigateTo("/dashboard");
+            }
+            else
+            {
+                errorMessage = "Invalid username or password";
+                successMessage = null;
+            }
         }
-        else
+        catch (Exception ex)
         {
-            errorMessage = "Invalid username or password";
-            successMessage = null;
+            Console.WriteLine($"Error logging in: {ex.Message}");
         }
     }
 }
