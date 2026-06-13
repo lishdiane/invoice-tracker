@@ -52,25 +52,25 @@
 @* Upcoming Invoices Table *@
 <div class="table-responsive">
     <div class="page-content">
-    <table class="table custom-table align-middle">
-        <thead>
-            <tr>
-                <th>Invoice ID</th>
-                <th>Client</th>
-                <th>Due Date</th>
-                <th>Status</th>
-                <th>Details</th>
-            </tr>
-        </thead>
-
-        @* Upcoming Invoices Rows *@
-        <tbody>
-            @foreach (var invoice in invoices)
-            {
+        <table class="table custom-table align-middle">
+            <thead>
                 <tr>
-                    <td>#@invoice.InvoiceId</td>
-                    <td>@invoice.Client?.ClientName</td>
-                    <td>@invoice.DueDate.ToShortDateString()</td>
+                    <th>Invoice ID</th>
+                    <th>Client</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+              
+            @* Upcoming Invoices Rows *@
+            <tbody>
+                @foreach (var invoice in invoices)
+                {
+                    <tr>
+                        <td>#@invoice.InvoiceId</td>
+                        <td>@invoice.Client?.ClientName</td>
+                        <td>@invoice.DueDate.ToShortDateString()</td>
                         <td>
                             @if (invoice.IsPaid)
                             {
@@ -82,14 +82,14 @@
                             }
                         </td>
                         <td>
-                        <a class="btn btn-custom btn-info btn-sm" href="/invoices/view/@invoice.InvoiceId">
-                            View
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                            <a class="btn btn-custom btn-info btn-sm" href="/invoices/view/@invoice.InvoiceId">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -140,27 +140,34 @@
             return;
         }
 
-        // Load dashboard data
-        totalInvoices =
-            await Context.Invoices
-            .Where(i => UserSession.UserId == i.UserId)
-            .CountAsync();
+        try
+        {
+            // Load dashboard data
+            totalInvoices =
+                await Context.Invoices
+                .Where(i => UserSession.UserId == i.UserId)
+                .CountAsync();
 
-        paidInvoices =
-            await Context.Invoices
-            .Where(i => UserSession.UserId == i.UserId)
-            .CountAsync(i => i.IsPaid);
+            paidInvoices =
+                await Context.Invoices
+                .Where(i => UserSession.UserId == i.UserId)
+                .CountAsync(i => i.IsPaid);
 
-        unpaidInvoices =
-            await Context.Invoices
-            .Where(i => UserSession.UserId == i.UserId)
-            .CountAsync(i => !i.IsPaid);
+            unpaidInvoices =
+                await Context.Invoices
+                .Where(i => UserSession.UserId == i.UserId)
+                .CountAsync(i => !i.IsPaid);
 
-        invoices = await Context.Invoices
-            .Include(i => i.Client)
-            .Where(i => UserSession.UserId == i.UserId && !i.IsPaid)
-            .OrderBy(i => i.DueDate)
-            .Take(5)
-            .ToListAsync();
+            invoices = await Context.Invoices
+                .Include(i => i.Client)
+                .Where(i => UserSession.UserId == i.UserId && !i.IsPaid)
+                .OrderBy(i => i.DueDate)
+                .Take(5)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading dashboard: {ex.Message}");
+        }
     }
 }

@@ -61,6 +61,14 @@ else
         </div>
     }
 
+    @if (!string.IsNullOrEmpty(deleteError))
+    {
+        <div class="alert alert-danger">
+            @deleteError
+        </div>
+    }
+
+    <!-- Filters -->
     @* Filter Section *@
     <div class="filter-section page-content filter-box">
         <div class="filters mb-3 d-flex flex-wrap gap-2 centered">
@@ -223,7 +231,7 @@ else
                             </td>
 
                             <td>
-                                @GetTotal(invoice).ToString("C")
+                                @GetTotal(invoice).ToString("C", new System.Globalization.CultureInfo("en-US"))
                             </td>
 
                             <td>
@@ -266,7 +274,8 @@ else
                 <div class="invoice-body">
                     <div>Date: <span>@invoice.InvoiceDate.ToShortDateString()</span></div>
                     <div>Due: <span>@invoice.DueDate.ToShortDateString()</span></div>
-                    <div>Total: <span>@GetTotal(invoice).ToString("C")</span></div>
+                    <div>Total: <span>@GetTotal(invoice).ToString("C", new System.Globalization.CultureInfo("en-US"))</span>
+                    </div>
                 </div>
                 <div class="line"></div>
                 <div class="invoice-actions">
@@ -285,6 +294,7 @@ else
     List<Invoice>? invoices;
 
     int? deleteId;
+    private string deleteError = "";
     bool showConfirm = false;
 
     bool showSuccess = false;
@@ -308,7 +318,6 @@ else
         {
             successMessage = "Invoice deleted successfully.";
         }
-
         if (query["message"] == "update")
         {
             successMessage = "Invoice updated successfully.";
@@ -318,12 +327,19 @@ else
         {
             successMessage = "Invoice created successfully.";
         }
-
-        invoices = await Context.Invoices
-            .Include(i => i.Client)
-            .Include(i => i.InvoiceProducts)
-            .Where(i => UserSession.UserId == i.UserId)
-            .ToListAsync();
+                
+        try
+        {
+          invoices = await Context.Invoices
+              .Include(i => i.Client)
+              .Include(i => i.InvoiceProducts)
+              .Where(i => UserSession.UserId == i.UserId)
+              .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading invoices: {ex.Message}");
+        }
 
         isLoading = false;
     }
@@ -357,26 +373,37 @@ else
     // Method to confirm deletion of an invoice, remove it from the database, and update the UI
     async Task ConfirmDelete()
     {
+        deleteError = "";
         if (deleteId == null)
             return;
 
-        var invoice = await Context.Invoices.FindAsync(deleteId.Value);
-
-        if (invoice != null)
+        try
         {
-            Context.Invoices.Remove(invoice);
-            await Context.SaveChangesAsync();
+            var invoice = await Context.Invoices.FindAsync(deleteId.Value);
 
-            invoices?.RemoveAll(i => i.InvoiceId == deleteId.Value);
+            if (invoice != null)
+            {
+                Context.Invoices.Remove(invoice);
+                await Context.SaveChangesAsync();
 
-            successMessage = $"Invoice #{deleteId.Value} deleted successfully.";
-            showSuccess = true;
-
-            StateHasChanged();
-
-            await Task.Delay(2000);
-            showSuccess = false;
-            showConfirm = false;
+                invoices?.RemoveAll(i => i.InvoiceId == deleteId.Value);
+                successMessage = $"Invoice #{deleteId.Value} deleted successfully.";
+                 showSuccess = true;
+                 StateHasChanged();
+  
+                  await Task.Delay(2000);
+                  showSuccess = false;
+                  showConfirm = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            deleteError = "Could not delete invoice. Please try again.";
+            Console.WriteLine($"Error deleting invoice: {ex.Message}");
+        }
+        finally
+        {
+            deleteId = null;
         }
     }
 
@@ -389,46 +416,53 @@ else
     // Method to apply filters to the invoice list based on search term, status, and date range
     void ApplyFilters()
     {
-        var query = Context.Invoices
-            .Include(i => i.Client)
-            .Include(i => i.InvoiceProducts)
-            .Where(i => UserSession.UserId == i.UserId)
-            .AsQueryable();
-
-        // Search filter using case-insensitive matching
-        if (!string.IsNullOrWhiteSpace(searchTerm))
+        try
         {
-            query = query.Where(i => EF.Functions.ILike(i.Client.ClientName, $"%{searchTerm}%"));
-        }
+            // Search filter using case-insensitive matching
+            var query = Context.Invoices
+                .Include(i => i.Client)
+                .Include(i => i.InvoiceProducts)
+                .Where(i => UserSession.UserId == i.UserId)
+                .AsQueryable();
 
-        if (fromDate != null)
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(i => EF.Functions.ILike(i.Client.ClientName, $"%{searchTerm}%"));
+            }
+
+            if (fromDate != null)
+            {
+                var fromUtc = DateTime.SpecifyKind(
+                    fromDate.Value.Date,
+                    DateTimeKind.Utc);
+
+                query = query.Where(i => i.InvoiceDate >= fromUtc);
+            }
+
+            if (toDate != null)
+            {
+                var toUtc = DateTime.SpecifyKind(
+                    toDate.Value.Date.AddDays(1),
+                    DateTimeKind.Utc);
+
+                query = query.Where(i => i.InvoiceDate < toUtc);
+            }
+
+            if (statusFilter == "paid")
+            {
+                query = query.Where(i => i.IsPaid);
+            }
+            else if (statusFilter == "unpaid")
+            {
+                query = query.Where(i => !i.IsPaid);
+            }
+
+            invoices = query.ToList();
+        }
+        catch (Exception ex)
         {
-            var fromUtc = DateTime.SpecifyKind(
-                fromDate.Value.Date,
-                DateTimeKind.Utc);
-
-            query = query.Where(i => i.InvoiceDate >= fromUtc);
+            Console.WriteLine($"Error applying filters: {ex.Message}");
         }
-
-        if (toDate != null)
-        {
-            var toUtc = DateTime.SpecifyKind(
-                toDate.Value.Date.AddDays(1),
-                DateTimeKind.Utc);
-
-            query = query.Where(i => i.InvoiceDate < toUtc);
-        }
-
-        if (statusFilter == "paid")
-        {
-            query = query.Where(i => i.IsPaid);
-        }
-        else if (statusFilter == "unpaid")
-        {
-            query = query.Where(i => !i.IsPaid);
-        }
-
-        invoices = query.ToList();
     }
 
     // Method to clear all filters

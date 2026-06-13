@@ -13,17 +13,17 @@
 
   @* When the user is not logged in show a loading message *@
   @if (currentUser == null)
-  {
-    <p>Loading...</p>
-  }
-  else
-  {
-    <div class="profile-card">
-
-<h1>Account Details</h1> <br />
-      @* Display user details when not editing, otherwise show the edit form *@
-      @if (!isEditing)
-      {
+{
+  <p>Loading...</p>
+}
+else
+{
+  <div class="profile-card">
+    <h1>Account Details</h1> <br />
+    
+    @* Display user details when not editing, otherwise show the edit form *@
+    @if (!isEditing)
+    {
       <p>
         <strong>Company Name:</strong>
         @currentUser.CompanyName
@@ -48,88 +48,90 @@
       <button class="btn btn-success" @onclick="(() => isEditing = true)">
         Edit Account
       </button>
-      } 
-      else
-      {
+    }
+    else
+    {
       <EditForm Model="currentUser" OnValidSubmit="UpdateAccount" FormName="edit-account">
         <DataAnnotationsValidator />
         <div class="form-group">
-            <label for="companyEmail">Email</label>
-            <InputText id="companyEmail" class="form-control" @bind-Value="currentUser.CompanyEmail" />
+          <label for="companyEmail">Email</label>
+          <InputText id="companyEmail" class="form-control" @bind-Value="currentUser.CompanyEmail" />
         </div>
 
         <div class="form-group">
-            <label for="companyPhone">Phone</label>
-            <InputText id="companyPhone" class="form-control" @bind-Value="currentUser.CompanyPhone" />
+          <label for="companyPhone">Phone</label>
+          <InputText id="companyPhone" class="form-control" @bind-Value="currentUser.CompanyPhone" />
         </div>
 
         <div class="form-group">
-            <label for="companyAddress">Street Address</label>
-            <InputText id="companyAddress" class="form-control" @bind-Value="currentUser.CompanyAddress" />
+          <label for="companyAddress">Street Address</label>
+          <InputText id="companyAddress" class="form-control" @bind-Value="currentUser.CompanyAddress" />
         </div>
 
         <div class="address-row">
-            <div class="form-group">
-                <label for="companyCity">City</label>
-                <InputText id="companyCity" class="form-control" @bind-Value="currentUser.CompanyCity" />
-            </div>
+          <div class="form-group">
+            <label for="companyCity">City</label>
+            <InputText id="companyCity" class="form-control" @bind-Value="currentUser.CompanyCity" />
+          </div>
 
-            <div class="form-group state-field">
-                <label for="companyState">State</label>
-                <InputText id="companyState" class="form-control" @bind-Value="currentUser.CompanyState" />
-            </div>
+          <div class="form-group state-field">
+            <label for="companyState">State</label>
+            <InputText id="companyState" class="form-control" @bind-Value="currentUser.CompanyState" />
+          </div>
         </div>
 
         <button class="btn btn-success" @onclick="UpdateAccount">
-            Save Changes
+          Save Changes
         </button>
       </EditForm>
+    }
+    <div>
+      <br />
+      <h2>Change Password</h2>
+      
+      @* Display password change message *@
+      @if (!string.IsNullOrEmpty(passwordMessage))
+      {
+        <div class="alert alert-info">
+          @passwordMessage
+        </div>
       }
-      <div>
-        <br/>
-        <h2>Change Password</h2>
 
-        @* Display password change message *@
-        @if (!string.IsNullOrEmpty(passwordMessage))
-        {
-          <div class="alert alert-info">
-              @passwordMessage
-          </div>
-        }
+      <EditForm Model="changePassword" OnValidSubmit="ChangePassword" FormName="change-password">
 
-        <EditForm Model="changePassword" OnValidSubmit="ChangePassword" FormName="change-password">
+        <DataAnnotationsValidator />
 
-          <DataAnnotationsValidator />
+        <div class="form-group">
+          <label for="currentPassword">Current Password</label>
+          <InputText id="currentPassword" type="password" class="form-control"
+                     @bind-Value="changePassword.CurrentPassword" />
+          <ValidationMessage For="@(() => changePassword.CurrentPassword)" />
+        </div>
 
-          <div class="form-group">
-            <label for="currentPassword">Current Password</label>
-            <InputText id="currentPassword" type="password" class="form-control" @bind-Value="changePassword.CurrentPassword" />
-            <ValidationMessage For="@(() => changePassword.CurrentPassword)" />
-          </div>
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <InputText id="newPassword" type="password" class="form-control" @bind-Value="changePassword.NewPassword" />
+          <ValidationMessage For="@(() => changePassword.NewPassword)" />
+        </div>
 
-          <div class="form-group">
-            <label for="newPassword">New Password</label>
-            <InputText id="newPassword" type="password" class="form-control" @bind-Value="changePassword.NewPassword" />
-            <ValidationMessage For="@(() => changePassword.NewPassword)" />
-          </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm New Password</label>
+          <InputText id="confirmPassword" type="password" class="form-control"
+                     @bind-Value="changePassword.ConfirmPassword" />
+          <ValidationMessage For="@(() => changePassword.ConfirmPassword)" />
+        </div>
 
-          <div class="form-group">
-            <label for="confirmPassword">Confirm New Password</label>
-            <InputText id="confirmPassword" type="password" class="form-control" @bind-Value="changePassword.ConfirmPassword" />
-            <ValidationMessage For="@(() => changePassword.ConfirmPassword)" />
-          </div>
-
-          <button type="submit" class="btn btn-warning">
-            Change Password
-          </button>
-        </EditForm>
-      </div>
-
+        <button type="submit" class="btn btn-warning">
+          Change Password
+        </button>
+      </EditForm>
     </div>
-  }
+
+  </div>
+}
 
 
-@code{
+@code {
   private User? currentUser;
   private ChangePasswordModel changePassword = new();
   private string passwordMessage = "";
@@ -143,15 +145,22 @@
     if (!UserSession.IsAuthenticated)
     {
       Navigation.NavigateTo("/login");
-    }  
+    }
     await LoadUser();
   }
 
   // Load the current user's details from the database based on the UserSession's UserId
   private async Task LoadUser()
   {
-    currentUser = await Db.Users
-      .FirstOrDefaultAsync(u => u.UserId == UserSession.UserId);
+    try
+    {
+      currentUser = await Db.Users
+        .FirstOrDefaultAsync(u => u.UserId == UserSession.UserId);
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error loading user: {ex.Message}");
+    }
   }
 
   // Navigate to the edit account page 
@@ -164,38 +173,52 @@
   // Save the updated account details to the database and reload the user information
   private async Task UpdateAccount()
   {
-    await Db.SaveChangesAsync();
-    await LoadUser();
-    isEditing = false;
+    try
+    {
+      await Db.SaveChangesAsync();
+      await LoadUser();
+      isEditing = false;
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error updating account: {ex.Message}");
+    }
   }
 
   // Change the user's password. 
   // It first verifies that the current password is correct, and if so, hashes the new password and saves it to the database.
   private async Task ChangePassword()
-  { 
+  {
     if (currentUser == null)
       return;
-    
+
     var result = _passwordHasher.VerifyHashedPassword(
-      currentUser, 
-      currentUser.Password, 
-      changePassword.CurrentPassword);
+          currentUser,
+          currentUser.Password,
+          changePassword.CurrentPassword);
 
     if (result == PasswordVerificationResult.Failed)
     {
       passwordMessage = "Current password is incorrect.";
       return;
     }
-    
-    currentUser.Password = 
-    _passwordHasher.HashPassword(
-      currentUser, 
-      changePassword.NewPassword);
-    
-    await Db.SaveChangesAsync();
-    await LoadUser();
-    passwordMessage = "Password changed successfully.";
 
-    changePassword = new ChangePasswordModel();
+    currentUser.Password =
+        _passwordHasher.HashPassword(
+          currentUser,
+          changePassword.NewPassword);
+    try
+    {
+      await Db.SaveChangesAsync();
+      await LoadUser();
+      passwordMessage = "Password changed successfully.";
+
+      changePassword = new ChangePasswordModel();
+    }
+    catch (Exception ex)
+    {
+      passwordMessage = "Error saving password. Please try again.";
+      Console.WriteLine($"Error changing password: {ex.Message}");
+    }
   }
 }
