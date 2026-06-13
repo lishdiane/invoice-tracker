@@ -25,9 +25,8 @@
                 <InputSelect 
                     name="ClientId"
                     class="@validator.GetFieldCssClass(nameof(createInvoice.ClientId))" 
-                    @bind-Value="selectedClientId"
-                    @bind-Value:after="OnClientChanged"
-                    @onblur="@(() => validator.ValidateField(nameof(createInvoice.ClientId)))">
+                    @bind-Value="createInvoice.ClientId"
+                    @bind-Value:after="OnClientChanged">
                     
                     <option value="0">-- Select Client --</option>
                     @* Client Options *@
@@ -310,6 +309,16 @@
             Navigation.NavigateTo("/login");
         }
         editContext = new EditContext(createInvoice);
+
+        editContext.OnFieldChanged += (_, __) =>
+        {
+            InvokeAsync(StateHasChanged);
+        };
+
+        editContext.OnValidationStateChanged += (_, __) =>
+        {
+            InvokeAsync(StateHasChanged);
+        };
         validator = new FormValidationHelper(editContext, requiredFields);
         createInvoice.Lines.Add(new CreateInvoiceLine());
 
@@ -332,14 +341,14 @@
     private void OnClientChanged()
     {
         Console.WriteLine(selectedClientId);
-        if (selectedClientId == -1)
+        if (createInvoice.ClientId == -1)
         {
             showClientModal = true;
         }
-        else
-        {
-            createInvoice.ClientId = selectedClientId.Value;
-        }
+        createInvoice.ClientId = selectedClientId.Value;
+        editContext.NotifyFieldChanged(
+            new FieldIdentifier(createInvoice, nameof(createInvoice.ClientId))
+        );
     }
 
     // Set the active line when a product is selected, so that if the user creates a new product, 
@@ -388,7 +397,7 @@
         }
         await Context.SaveChangesAsync();
 
-        Navigation.NavigateTo("/invoices");
+        Navigation.NavigateTo("/invoices?message=create");
     }
 
     // Cancel invoice creation and navigate back to the invoice list page

@@ -107,7 +107,7 @@
 
             await Context.SaveChangesAsync();
 
-            Navigation.NavigateTo("/invoices");
+            Navigation.NavigateTo("/invoices?message=update");
         }
         catch (Exception ex)
         {
