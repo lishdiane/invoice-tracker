@@ -158,16 +158,18 @@
                 <div class="modal-buttons">
                     <button
                         type="button"
+                        class="btn btn-primary"
+                        @onclick="SaveNewProduct"
+                        disabled="@(!isProductFormValid)">
+                        Save Product
+                    </button>
+                    <button
+                        type="button"
                         class="btn btn-secondary"
                         @onclick="CloseProductModal">
                         Cancel
                     </button>
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        @onclick="SaveNewProduct">
-                        Save Product
-                    </button>
+                    
                 </div>
                 
             </div>
@@ -238,12 +240,14 @@
                 <div class="modal-buttons mt-3">
                     <button type="button"
                             class="btn btn-primary"
-                            @onclick="SaveNewClient">
+                            @onclick="SaveNewClient"
+                            disabled="@(!isClientFormValid)">
                         Save Client
                     </button>
                     <button type="button"
                             class="btn btn-secondary"
-                            @onclick="CloseClientModal">
+                            @onclick="CloseClientModal"
+                            >
                         Cancel
                     </button>
                 </div>
@@ -289,6 +293,16 @@
         !editContext.GetValidationMessages().Any() &&
         createInvoice.Lines.Count > 0 &&
         createInvoice.Lines.All(line => line.ProductId > 0 && line.Quantity > 0);
+    private bool isClientFormValid =>
+        !string.IsNullOrWhiteSpace(newClient.ClientName) &&
+        !string.IsNullOrWhiteSpace(newClient.ClientPhone) &&
+        !string.IsNullOrWhiteSpace(newClient.ClientAddress) &&
+        !string.IsNullOrWhiteSpace(newClient.ClientCity) &&
+        !string.IsNullOrWhiteSpace(newClient.ClientState);
+    private bool isProductFormValid =>
+        !string.IsNullOrWhiteSpace(newProduct.ProductName) &&
+        newProduct.ProductPrice > 0;
+
     private bool showProductModal;
     private bool showClientModal;
     private string productError = "";

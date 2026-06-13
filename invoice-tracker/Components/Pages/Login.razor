@@ -58,7 +58,7 @@
     private string errorMessage = "";
     private string? successMessage;
     private readonly PasswordHasher<User> _passwordHasher = new();
-    
+
     // Check for logout message in query string to display success message
     protected override void OnInitialized()
     {
@@ -85,6 +85,7 @@
             if (user == null)
             {
                 errorMessage = "Invalid username or password";
+                successMessage = null;
                 return;
             }
 
@@ -104,13 +105,13 @@
             else
             {
                 errorMessage = "Invalid username or password";
+                successMessage = null;
             }
-
         }
         catch (Exception ex)
         {
             errorMessage = "An error occurred. Please try again.";
-            Console.WriteLine($"Login error: {ex.Message}");
+            Console.WriteLine($"Error logging in: {ex.Message}");
         }
     }
 }
