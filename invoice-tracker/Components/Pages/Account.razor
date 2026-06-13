@@ -12,9 +12,15 @@
 <PageTitle>Account Details</PageTitle>
 
   @* When the user is not logged in show a loading message *@
-  @if (currentUser == null)
+  @if (isLoading)
   {
     <p>Loading...</p>
+  }
+  else if (currentUser == null)
+  {
+    <div class="alert alert-danger">
+      No account found
+    </div>
   }
   else
   {
@@ -51,38 +57,59 @@
       } 
       else
       {
-      <EditForm Model="currentUser" OnValidSubmit="UpdateAccount" FormName="edit-account">
+      <EditForm EditContext="accountEditContext" OnSubmit="UpdateAccount" FormName="edit-account">
         <DataAnnotationsValidator />
         <div class="form-group">
             <label for="companyEmail">Email</label>
-            <InputText id="companyEmail" class="form-control" @bind-Value="currentUser.CompanyEmail" />
+            <InputText 
+              id="companyEmail" 
+              class="form-control" 
+              @bind-Value="currentUser.CompanyEmail" />
+            <ValidationMessage For="@(() => currentUser.CompanyEmail)" />
         </div>
 
         <div class="form-group">
             <label for="companyPhone">Phone</label>
-            <InputText id="companyPhone" class="form-control" @bind-Value="currentUser.CompanyPhone" />
+            <InputText 
+              id="companyPhone" 
+              class="form-control" 
+              @bind-Value="currentUser.CompanyPhone" />
+            <ValidationMessage For="@(() => currentUser.CompanyPhone)" />
         </div>
 
         <div class="form-group">
             <label for="companyAddress">Street Address</label>
-            <InputText id="companyAddress" class="form-control" @bind-Value="currentUser.CompanyAddress" />
+            <InputText 
+              id="companyAddress" 
+              class="form-control" 
+              @bind-Value="currentUser.CompanyAddress" />
+            <ValidationMessage For="@(() => currentUser.CompanyAddress)" />
         </div>
 
         <div class="address-row">
             <div class="form-group">
                 <label for="companyCity">City</label>
-                <InputText id="companyCity" class="form-control" @bind-Value="currentUser.CompanyCity" />
+                <InputText 
+                  id="companyCity" 
+                  class="form-control" 
+                  @bind-Value="currentUser.CompanyCity" />
+                <ValidationMessage For="@(() => currentUser.CompanyCity)" />
             </div>
 
             <div class="form-group state-field">
                 <label for="companyState">State</label>
-                <InputText id="companyState" class="form-control" @bind-Value="currentUser.CompanyState" />
+                <InputText 
+                  id="companyState" 
+                  class="form-control" 
+                  @bind-Value="currentUser.CompanyState" />
+                <ValidationMessage For="@(() => currentUser.CompanyState)" />
             </div>
         </div>
 
-        <button class="btn btn-success" @onclick="UpdateAccount">
+        <button type="submit" class="btn btn-success" disabled="@(!isAccountInfoValid)">
             Save Changes
         </button>
+        <ValidationSummary />
       </EditForm>
       }
       <div>
@@ -97,29 +124,41 @@
           </div>
         }
 
-        <EditForm Model="changePassword" OnValidSubmit="ChangePassword" FormName="change-password">
+        <EditForm EditContext="passwordEditContext" OnSubmit="ChangePassword" FormName="change-password">
 
           <DataAnnotationsValidator />
 
           <div class="form-group">
             <label for="currentPassword">Current Password</label>
-            <InputText id="currentPassword" type="password" class="form-control" @bind-Value="changePassword.CurrentPassword" />
+            <InputText 
+              id="currentPassword" 
+              type="password" 
+              class="form-control" 
+              @bind-Value="changePassword.CurrentPassword" />
             <ValidationMessage For="@(() => changePassword.CurrentPassword)" />
           </div>
 
           <div class="form-group">
             <label for="newPassword">New Password</label>
-            <InputText id="newPassword" type="password" class="form-control" @bind-Value="changePassword.NewPassword" />
+            <InputText 
+              id="newPassword" 
+              type="password" 
+              class="form-control" 
+              @bind-Value="changePassword.NewPassword" />
             <ValidationMessage For="@(() => changePassword.NewPassword)" />
           </div>
 
           <div class="form-group">
             <label for="confirmPassword">Confirm New Password</label>
-            <InputText id="confirmPassword" type="password" class="form-control" @bind-Value="changePassword.ConfirmPassword" />
+            <InputText 
+              id="confirmPassword" 
+              type="password" 
+              class="form-control" 
+              @bind-Value="changePassword.ConfirmPassword" />
             <ValidationMessage For="@(() => changePassword.ConfirmPassword)" />
           </div>
 
-          <button type="submit" class="btn btn-warning">
+          <button type="submit" class="btn btn-warning" disabled="@(!isPasswordChangeValid)">
             Change Password
           </button>
         </EditForm>
@@ -134,10 +173,26 @@
   private ChangePasswordModel changePassword = new();
   private string passwordMessage = "";
   private bool isEditing = false;
+  private bool isLoading = true;
   private readonly PasswordHasher<User> _passwordHasher = new();
+  private bool isAccountInfoValid =>
+      currentUser is not null &&
+      !string.IsNullOrWhiteSpace(currentUser.CompanyEmail) &&
+      !string.IsNullOrWhiteSpace(currentUser.CompanyPhone) &&
+      !string.IsNullOrWhiteSpace(currentUser.CompanyAddress) &&
+      !string.IsNullOrWhiteSpace(currentUser.CompanyCity) &&
+      !string.IsNullOrWhiteSpace(currentUser.CompanyState);
+  private bool isPasswordChangeValid =>
+      !string.IsNullOrWhiteSpace(changePassword.CurrentPassword) &&
+      !string.IsNullOrWhiteSpace(changePassword.NewPassword) &&
+      !string.IsNullOrWhiteSpace(changePassword.ConfirmPassword) &&
+      changePassword.NewPassword == changePassword.ConfirmPassword;
 
-    // On component initialization, check if the user is authenticated. 
-    // If not, redirect to the login page. If authenticated, load the user's details.
+  private EditContext? accountEditContext;
+  private EditContext? passwordEditContext;
+
+  // On component initialization, check if the user is authenticated. 
+  // If not, redirect to the login page. If authenticated, load the user's details.
   protected override async Task OnInitializedAsync()
   {
     if (!UserSession.IsAuthenticated)
@@ -145,6 +200,12 @@
       Navigation.NavigateTo("/login");
     }  
     await LoadUser();
+    accountEditContext = new EditContext(currentUser!);
+    passwordEditContext = new EditContext(changePassword);
+
+    accountEditContext.OnFieldChanged += (_, __) => StateHasChanged();
+    passwordEditContext.OnFieldChanged += (_, __) => StateHasChanged();
+    isLoading = false;
   }
 
   // Load the current user's details from the database based on the UserSession's UserId
@@ -164,9 +225,24 @@
   // Save the updated account details to the database and reload the user information
   private async Task UpdateAccount()
   {
+    Console.WriteLine("Updating account");
+    if (currentUser is null)
+      return;
+
+    if (string.IsNullOrWhiteSpace(currentUser.CompanyEmail) ||
+        string.IsNullOrWhiteSpace(currentUser.CompanyPhone) ||
+        string.IsNullOrWhiteSpace(currentUser.CompanyAddress) ||
+        string.IsNullOrWhiteSpace(currentUser.CompanyCity) ||
+        string.IsNullOrWhiteSpace(currentUser.CompanyState))
+    {
+      return;
+    }
+
     await Db.SaveChangesAsync();
     await LoadUser();
     isEditing = false;
+    await InvokeAsync(StateHasChanged);
+
   }
 
   // Change the user's password. 
@@ -175,6 +251,12 @@
   { 
     if (currentUser == null)
       return;
+
+    if (string.IsNullOrWhiteSpace(changePassword.CurrentPassword) ||
+        string.IsNullOrWhiteSpace(changePassword.NewPassword) ||
+        string.IsNullOrWhiteSpace(changePassword.ConfirmPassword))
+      return;
+
     
     var result = _passwordHasher.VerifyHashedPassword(
       currentUser, 
