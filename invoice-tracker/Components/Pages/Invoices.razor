@@ -318,6 +318,16 @@ else
         {
             successMessage = "Invoice deleted successfully.";
         }
+        if (query["message"] == "update")
+        {
+            successMessage = "Invoice updated successfully.";
+        }
+
+        if (query["message"] == "create")
+        {
+            successMessage = "Invoice created successfully.";
+        }
+                
         try
         {
           invoices = await Context.Invoices

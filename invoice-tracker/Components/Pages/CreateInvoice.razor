@@ -18,10 +18,14 @@
         <div class="mb-3">
             <div>
                 <label for="client" class="form-label">Client</label>
-
-                <InputSelect name="ClientId" class="@validator.GetFieldCssClass(nameof(createInvoice.ClientId))"
-                             @bind-Value="selectedClientId" @bind-Value:after="OnClientChanged"
-                             @onblur="@(() => validator.ValidateField(nameof(createInvoice.ClientId)))">
+    
+                <InputSelect 
+                    name="ClientId"
+                    class="@validator.GetFieldCssClass(nameof(createInvoice.ClientId))" 
+                    @bind-Value="selectedClientId"
+                    @bind-Value:after="OnClientChanged"
+                    @onblur="@(() => validator.ValidateField(nameof(createInvoice.ClientId)))">
+                    
                     <option value="0">-- Select Client --</option>
                     @* Client Options *@
                     @foreach (var client in clients)
@@ -299,6 +303,16 @@
             Navigation.NavigateTo("/login");
         }
         editContext = new EditContext(createInvoice);
+
+        editContext.OnFieldChanged += (_, __) =>
+        {
+            InvokeAsync(StateHasChanged);
+        };
+
+        editContext.OnValidationStateChanged += (_, __) =>
+        {
+            InvokeAsync(StateHasChanged);
+        };
         validator = new FormValidationHelper(editContext, requiredFields);
         createInvoice.Lines.Add(new CreateInvoiceLine());
 
@@ -331,11 +345,14 @@
         if (selectedClientId == -1)
         {
             showClientModal = true;
-        }
-        else
+        } 
+        else 
         {
-            createInvoice.ClientId = selectedClientId.Value;
-        }
+          createInvoice.ClientId = selectedClientId.Value;
+          editContext.NotifyFieldChanged(
+              new FieldIdentifier(createInvoice, nameof(createInvoice.ClientId))
+          );
+      }
     }
 
     // Set the active line when a product is selected, so that if the user creates a new product, 
@@ -384,8 +401,7 @@
                 Context.InvoiceProducts.Add(invoiceProduct);
             }
             await Context.SaveChangesAsync();
-
-            Navigation.NavigateTo("/invoices");
+        Navigation.NavigateTo("/invoices?message=create");
 
         }
         catch (Exception ex)
