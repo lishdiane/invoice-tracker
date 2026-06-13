@@ -76,9 +76,11 @@
     {
         errorMessage = "";
 
-        var user = await DbContext.Users
-            .FirstOrDefaultAsync(u =>
-                u.Username == loginModel.Username);
+        try
+        {
+            var user = await DbContext.Users
+                .FirstOrDefaultAsync(u =>
+                    u.Username == loginModel.Username);
 
         if (user == null)
         {
@@ -87,16 +89,16 @@
             return;
         }
 
-        var result = _passwordHasher.VerifyHashedPassword(
-            user,
-            user.Password,
-            loginModel.Password);
+            var result = _passwordHasher.VerifyHashedPassword(
+                user,
+                user.Password,
+                loginModel.Password);
 
-        if (result == PasswordVerificationResult.Success)
-        {
-            UserSession.IsAuthenticated = true;
-            UserSession.UserId = user.UserId;
-            UserSession.Username = user.Username;
+            if (result == PasswordVerificationResult.Success)
+            {
+                UserSession.IsAuthenticated = true;
+                UserSession.UserId = user.UserId;
+                UserSession.Username = user.Username;
 
             Navigation.NavigateTo("/dashboard");
         }
@@ -106,5 +108,4 @@
             successMessage = null;
         }
     }
-
 }

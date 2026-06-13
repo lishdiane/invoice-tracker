@@ -111,22 +111,22 @@
         </button>
         <ValidationSummary />
       </EditForm>
+    }
+    <div>
+      <br />
+      <h2>Change Password</h2>
+      
+      @* Display password change message *@
+      @if (!string.IsNullOrEmpty(passwordMessage))
+      {
+        <div class="alert alert-info">
+          @passwordMessage
+        </div>
       }
-      <div>
-        <br/>
-        <h2>Change Password</h2>
-
-        @* Display password change message *@
-        @if (!string.IsNullOrEmpty(passwordMessage))
-        {
-          <div class="alert alert-info">
-              @passwordMessage
-          </div>
-        }
 
         <EditForm EditContext="passwordEditContext" OnSubmit="ChangePassword" FormName="change-password">
 
-          <DataAnnotationsValidator />
+        <DataAnnotationsValidator />
 
           <div class="form-group">
             <label for="currentPassword">Current Password</label>
@@ -164,11 +164,11 @@
         </EditForm>
       </div>
 
-    </div>
-  }
+  </div>
+}
 
 
-@code{
+@code {
   private User? currentUser;
   private ChangePasswordModel changePassword = new();
   private string passwordMessage = "";
@@ -198,7 +198,7 @@
     if (!UserSession.IsAuthenticated)
     {
       Navigation.NavigateTo("/login");
-    }  
+    }
     await LoadUser();
     accountEditContext = new EditContext(currentUser!);
     passwordEditContext = new EditContext(changePassword);
@@ -211,8 +211,15 @@
   // Load the current user's details from the database based on the UserSession's UserId
   private async Task LoadUser()
   {
-    currentUser = await Db.Users
-      .FirstOrDefaultAsync(u => u.UserId == UserSession.UserId);
+    try
+    {
+      currentUser = await Db.Users
+        .FirstOrDefaultAsync(u => u.UserId == UserSession.UserId);
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error loading user: {ex.Message}");
+    }
   }
 
   // Navigate to the edit account page 
@@ -248,7 +255,7 @@
   // Change the user's password. 
   // It first verifies that the current password is correct, and if so, hashes the new password and saves it to the database.
   private async Task ChangePassword()
-  { 
+  {
     if (currentUser == null)
       return;
 
@@ -259,25 +266,32 @@
 
     
     var result = _passwordHasher.VerifyHashedPassword(
-      currentUser, 
-      currentUser.Password, 
-      changePassword.CurrentPassword);
+          currentUser,
+          currentUser.Password,
+          changePassword.CurrentPassword);
 
     if (result == PasswordVerificationResult.Failed)
     {
       passwordMessage = "Current password is incorrect.";
       return;
     }
-    
-    currentUser.Password = 
-    _passwordHasher.HashPassword(
-      currentUser, 
-      changePassword.NewPassword);
-    
-    await Db.SaveChangesAsync();
-    await LoadUser();
-    passwordMessage = "Password changed successfully.";
 
-    changePassword = new ChangePasswordModel();
+    currentUser.Password =
+        _passwordHasher.HashPassword(
+          currentUser,
+          changePassword.NewPassword);
+    try
+    {
+      await Db.SaveChangesAsync();
+      await LoadUser();
+      passwordMessage = "Password changed successfully.";
+
+      changePassword = new ChangePasswordModel();
+    }
+    catch (Exception ex)
+    {
+      passwordMessage = "Error saving password. Please try again.";
+      Console.WriteLine($"Error changing password: {ex.Message}");
+    }
   }
 }

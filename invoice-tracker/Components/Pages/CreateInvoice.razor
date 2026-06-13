@@ -10,11 +10,8 @@
 <PageTitle>Create Invoice</PageTitle>
 
 <div class="page-content create-form">
-  <h1 class="pb-3">Create Invoice</h1>
-    <EditForm 
-        EditContext="editContext" 
-        OnValidSubmit="SaveInvoice" 
-        FormName="create-invoice">
+    <h1 class="pb-3">Create Invoice</h1>
+    <EditForm EditContext="editContext" OnValidSubmit="SaveInvoice" FormName="create-invoice">
         <DataAnnotationsValidator />
         
         @* Client Selection *@
@@ -25,8 +22,9 @@
                 <InputSelect 
                     name="ClientId"
                     class="@validator.GetFieldCssClass(nameof(createInvoice.ClientId))" 
-                    @bind-Value="createInvoice.ClientId"
-                    @bind-Value:after="OnClientChanged">
+                    @bind-Value="selectedClientId"
+                    @bind-Value:after="OnClientChanged"
+                    @onblur="@(() => validator.ValidateField(nameof(createInvoice.ClientId)))">
                     
                     <option value="0">-- Select Client --</option>
                     @* Client Options *@
@@ -36,7 +34,7 @@
                             @client.ClientName
                         </option>
                     }
-                <option value="-1">+ New Client</option>
+                    <option value="-1">+ New Client</option>
                 </InputSelect>
                 <ValidationMessage For="@(() => createInvoice.ClientId)" />
             </div>
@@ -49,18 +47,16 @@
                 @foreach (var line in createInvoice.Lines.Select((value, index) => new { value, index }))
                 {
                     <div class="product-line">
-                        <InputSelect 
-                            class="form-control" 
-                            @bind-Value="line.value.ProductId"
-                            @bind-Value:after="() => SetActiveLine(line.value)">
+                        <InputSelect class="form-control" @bind-Value="line.value.ProductId"
+                                     @bind-Value:after="() => SetActiveLine(line.value)">
                             <option value="0">-- Select Product --</option>
 
                             @* Product Options *@
                             @foreach (var product in products)
                             {
                                 <option value="@product.ProductId">
-                                    @product.ProductName - 
-                                    @product.ProductPrice.ToString("C")
+                                    @product.ProductName -
+                                    @product.ProductPrice.ToString("C", new System.Globalization.CultureInfo("en-US"))
                                 </option>
                             }
                         </InputSelect>
@@ -69,8 +65,8 @@
                             class="form-control"
                             @bind-Value="line.value.Quantity" />
                         <a>
-                            <button type="button" class="btn btn-custom btn-danger" 
-                                @onclick="() => RemoveProduct(line.index)">
+                            <button type="button" class="btn btn-custom btn-danger"
+                                    @onclick="() => RemoveProduct(line.index)">
                                 X
                             </button>
                         </a>
@@ -81,8 +77,7 @@
                         New Product
                     </button>
                 </a>
-                <button type="button" class="btn btn-custom btn-primary" 
-                    @onclick="AddProduct">Add Line
+                <button type="button" class="btn btn-custom btn-primary" @onclick="AddProduct">Add Line
                 </button>
             </div>
         </div>
@@ -90,26 +85,25 @@
         @* Invoice Date *@
         <div class="mb-3">
             <label class="form-label">Invoice Date</label>
-            <InputDate 
-                class="@validator.GetFieldCssClass(nameof(createInvoice.InvoiceDate))" 
-                @bind-Value="createInvoice.InvoiceDate" 
-                @onblur="@(_ => validator.ValidateField(nameof(createInvoice.InvoiceDate)))" />
+            <InputDate class="@validator.GetFieldCssClass(nameof(createInvoice.InvoiceDate))"
+                       @bind-Value="createInvoice.InvoiceDate"
+                       @onblur="@(_ => validator.ValidateField(nameof(createInvoice.InvoiceDate)))" />
             <ValidationMessage For="@(() => createInvoice.InvoiceDate)" />
         </div>
 
         @* Due Date *@
         <div class="mb-3">
             <label class="form-label">Due Date</label>
-            <InputDate 
-                class="@validator.GetFieldCssClass(nameof(createInvoice.DueDate))" 
-                @bind-Value="createInvoice.DueDate" 
-                @onblur="@(_ => validator.ValidateField(nameof(createInvoice.DueDate)))" />
+            <InputDate class="@validator.GetFieldCssClass(nameof(createInvoice.DueDate))"
+                       @bind-Value="createInvoice.DueDate"
+                       @onblur="@(_ => validator.ValidateField(nameof(createInvoice.DueDate)))" />
             <ValidationMessage For="@(() => createInvoice.DueDate)" />
         </div>
 
         @* Invoice Total *@
         <div class="invoice-total">
-            <p><strong>Invoice Total: </strong> @GetInvoiceTotal.ToString("C")</p>
+            <p><strong>Invoice Total: </strong> @GetInvoiceTotal.ToString("C", new
+                                                                System.Globalization.CultureInfo("en-US"))</p>
         </div>
 
         @* Action Buttons *@
@@ -126,7 +120,7 @@
         <ValidationSummary />
     </EditForm>
 
-    @* Product Modal to create a new product *@
+  @* Product Modal to create a new product *@
     @if (showProductModal)
     {
         <div class="modal-backdrop-custom">
@@ -275,14 +269,14 @@
 
     // Temporary models for new product and client creation in modals
     private Product newProduct = new()
-        {
-            ProductName = string.Empty
-        };
+    {
+        ProductName = string.Empty
+    };
     private Client newClient = new()
-        {
-            ClientName = "",
-            ClientPhone = ""
-        };
+    {
+        ClientName = "",
+        ClientPhone = ""
+    };
 
     // Required fields for validation
     private readonly string[] requiredFields = 
@@ -336,15 +330,22 @@
         validator = new FormValidationHelper(editContext, requiredFields);
         createInvoice.Lines.Add(new CreateInvoiceLine());
 
-        clients = await Context.Clients
-            .AsNoTracking()
-            .Where(client => client.UserId == UserSession.UserId)
-            .ToListAsync();
+        try
+        {
+            clients = await Context.Clients
+                .AsNoTracking()
+                .Where(client => client.UserId == UserSession.UserId)
+                .ToListAsync();
 
-        products = await Context.Products
-            .AsNoTracking()
-            .Where(product => product.UserId == UserSession.UserId)
-            .ToListAsync();
+            products = await Context.Products
+                .AsNoTracking()
+                .Where(product => product.UserId == UserSession.UserId)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading clients/products: {ex.Message}");
+        }
 
         createInvoice.InvoiceDate = DateTime.UtcNow.Date;
         createInvoice.DueDate = DateTime.UtcNow.Date.AddDays(30);
@@ -355,14 +356,17 @@
     private void OnClientChanged()
     {
         Console.WriteLine(selectedClientId);
-        if (createInvoice.ClientId == -1)
+        if (selectedClientId == -1)
         {
             showClientModal = true;
-        }
-        createInvoice.ClientId = selectedClientId.Value;
-        editContext.NotifyFieldChanged(
-            new FieldIdentifier(createInvoice, nameof(createInvoice.ClientId))
-        );
+        } 
+        else 
+        {
+          createInvoice.ClientId = selectedClientId.Value;
+          editContext.NotifyFieldChanged(
+              new FieldIdentifier(createInvoice, nameof(createInvoice.ClientId))
+          );
+      }
     }
 
     // Set the active line when a product is selected, so that if the user creates a new product, 
@@ -376,42 +380,48 @@
     // then creates the associated invoice line records, and finally navigates back to the invoice list page.
     async Task SaveInvoice()
     {
-        var invoice = new Invoice
+        try {
         // Assign values from the createInvoice model to the new Invoice entity
-        {
-            UserId = UserSession.UserId,
-            ClientId = createInvoice.ClientId,
-            InvoiceDate = DateTime.SpecifyKind(
-                createInvoice.InvoiceDate,
-                DateTimeKind.Utc),
-            DueDate = DateTime.SpecifyKind(
-                createInvoice.DueDate,
-                DateTimeKind.Utc)
-        };
-
-        Context.Invoices.Add(invoice);
-        await Context.SaveChangesAsync();
-
-        //Create invoice line records for each line in the createInvoice model
-        foreach (var invoiceLine in createInvoice.Lines)
-        {
-            var selectedProduct =
-                products.FirstOrDefault(
-                    p => p.ProductId == invoiceLine.ProductId);
-
-            var invoiceProduct = new InvoiceProduct
+            var invoice = new Invoice
             {
-                InvoiceId = invoice.InvoiceId,
-                ProductId = invoiceLine.ProductId,
-                Quantity = invoiceLine.Quantity,
-                Price = selectedProduct?.ProductPrice ?? 0
+                UserId = UserSession.UserId,
+                ClientId = createInvoice.ClientId,
+                InvoiceDate = DateTime.SpecifyKind(
+                    createInvoice.InvoiceDate,
+                    DateTimeKind.Utc),
+                DueDate = DateTime.SpecifyKind(
+                    createInvoice.DueDate,
+                    DateTimeKind.Utc)
             };
 
-            Context.InvoiceProducts.Add(invoiceProduct);
-        }
-        await Context.SaveChangesAsync();
+            Context.Invoices.Add(invoice);
+            await Context.SaveChangesAsync();
+      
+        //Create invoice line records for each line in the createInvoice model
+            foreach (var invoiceLine in createInvoice.Lines)
+            {
+                var selectedProduct =
+                    products.FirstOrDefault(
+                        p => p.ProductId == invoiceLine.ProductId);
 
+                var invoiceProduct = new InvoiceProduct
+                {
+                    InvoiceId = invoice.InvoiceId,
+                    ProductId = invoiceLine.ProductId,
+                    Quantity = invoiceLine.Quantity,
+                    Price = selectedProduct?.ProductPrice ?? 0
+                };
+
+                Context.InvoiceProducts.Add(invoiceProduct);
+            }
+            await Context.SaveChangesAsync();
         Navigation.NavigateTo("/invoices?message=create");
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving invoice: {ex.Message}");
+        }
     }
 
     // Cancel invoice creation and navigate back to the invoice list page
@@ -500,23 +510,32 @@
 
         newProduct.UserId = UserSession.UserId;
 
-        Context.Products.Add(newProduct);
-        await Context.SaveChangesAsync();
+        try {
+            Context.Products.Add(newProduct);
+            await Context.SaveChangesAsync();
 
-        products.Add(newProduct);
+            products.Add(newProduct);
 
-        if (activeLine is not null)
+            if (activeLine is not null)
+            {
+                activeLine.ProductId = newProduct.ProductId;
+            }
+            showProductModal = false;
+        }
+        catch (Exception ex)
         {
-            activeLine.ProductId = newProduct.ProductId;
-        }        
-        showProductModal = false;
+            productError = "Error saving product. Please try again.";
+            Console.WriteLine($"Error saving product: {ex.Message}");
+        }
     }
 
     // Save a new client to the database. It validates the client name and email.
     private async Task SaveNewClient()
     {
+        clientError = "";
         newClient.UserId = UserSession.UserId;
 
+        try {
         Context.Clients.Add(newClient);
         await Context.SaveChangesAsync();
 
@@ -530,6 +549,12 @@
         editContext.NotifyValidationStateChanged();
 
         showClientModal = false;
+        }
+        catch (Exception ex)
+        {
+            clientError = "Error saving client. Please try again.";
+            Console.WriteLine($"Error saving client: {ex.Message}");
+        }
     }
 
     // Calculate the total for a given invoice line by multiplying the quantity by the product price.
@@ -546,5 +571,5 @@
             var product = products.FirstOrDefault(p => p.ProductId == line.ProductId);
             return line.Quantity * (product?.ProductPrice ?? 0);
         });
-    
+
 }
