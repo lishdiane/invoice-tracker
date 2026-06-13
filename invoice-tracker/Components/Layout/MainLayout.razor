@@ -1,16 +1,18 @@
-﻿@inherits LayoutComponentBase
-
+﻿@* Main Layout *@
+@inherits LayoutComponentBase
 @using InvoiceTracker
 @inject UserSession UserSession
 @inject NavigationManager Navigation
+
 
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
-
+    @* Main content *@
     <main>
         <div class="top-row px-4 app-header">
+                @* User authentication status, when authenticated shows user info and logout option *@
                 @if (UserSession.IsAuthenticated)
                 {
                     <a href="/account">@UserSession.Username</a>
@@ -21,19 +23,18 @@
                     <a href="/login">Login</a>
                     <a href="/signup">Sign Up</a>
                 }
-            
         </div>
-
+        @* Content area *@
         <article class="content px-4">
             @Body
         </article>
-
+        @* Footer *@
         <footer class="app-footer">
             © 2026 Invoice Tracker | Team 02 Project
         </footer>
     </main>
 </div>
-
+@* Error handling *@
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>
@@ -43,6 +44,7 @@
 
 @code
 {
+    // Logout method to clear user session and redirect to login page
     private void Logout()
     {
         Console.WriteLine("Logout");

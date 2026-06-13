@@ -1,3 +1,4 @@
+// Login.cs - Model for user login, including properties for username and password with validation attributes
 using System.ComponentModel.DataAnnotations;
 
 namespace InvoiceTracker

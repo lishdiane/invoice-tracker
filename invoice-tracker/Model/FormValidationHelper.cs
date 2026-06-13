@@ -1,3 +1,4 @@
+// FormValidationHelper.cs - Provides helper methods for validating form fields and managing validation state in Blazor forms
 using Microsoft.AspNetCore.Components.Forms;
 
 public class FormValidationHelper

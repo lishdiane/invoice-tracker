@@ -1,3 +1,4 @@
+// CreateInvoice.cs - Model for creating a new invoice, including validation for required fields and ensuring due date is after invoice date
 using System.ComponentModel.DataAnnotations;
 
 namespace InvoiceTracker
@@ -13,6 +14,7 @@ namespace InvoiceTracker
     [Required]
     public List<CreateInvoiceLine> Lines { get; set; } = new();
 
+    // Validates that the due date is after the invoice date
     public IEnumerable<ValidationResult> Validate(
         ValidationContext validationContext)
     {

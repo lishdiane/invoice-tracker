@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 @inject UserSession UserSession
@@ -8,6 +8,7 @@
 
 
 <PageTitle>Home</PageTitle>
+@* Hero Section *@
 <div class="hero-section">
     <h1>Welcome to Invoice Tracker</h1>
 
@@ -16,8 +17,7 @@
         and keep your billing records organized in one place.
     </p>
 
-    
-
+    @* Action Buttons *@
     <div class="action-buttons">
         <a href="/invoices" class="btn btn-dark">
             View Invoices
@@ -29,6 +29,7 @@
     </div>
 </div>
 
+@* Features Section *@
 <div class="feature-grid">
 
     <div class="feature-card">
@@ -54,6 +55,7 @@
 
 </div>
 
+@* Getting Started section with links to other pages *@
 <div class="getting-started">
     <h3>Getting Started</h3>
     <ul class="getting-started-list">
@@ -92,6 +94,5 @@
         UserSession.UserId = 0;
         UserSession.Username = string.Empty;
         Navigation.NavigateTo("/login?message=logout");
-
     }
 }

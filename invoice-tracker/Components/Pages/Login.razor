@@ -13,18 +13,23 @@
 <div class="profile-card">
     <h1>Login</h1>
     
+    @* Error Message *@
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <div class="alert alert-danger">
             @errorMessage
         </div>
     }
+
+    @* Success Message when user logs out *@
     @if (!string.IsNullOrEmpty(successMessage))
     {
         <div class="alert alert-success">
             @successMessage
         </div>
     }
+
+    @* Login Form *@
     <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" FormName="login-form">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -54,6 +59,8 @@
     private string errorMessage = "";
     private string? successMessage;
     private readonly PasswordHasher<User> _passwordHasher = new();
+    
+    // Check for logout message in query string to display success message
     protected override void OnInitialized()
     {
         var uri = new Uri(Navigation.Uri);
@@ -64,6 +71,8 @@
             successMessage = "You have been logged out successfully.";
         }
     }
+
+    // Handle the login process
     private async Task HandleLogin()
     {
         errorMessage = "";

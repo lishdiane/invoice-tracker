@@ -1,3 +1,4 @@
+// InvoiceProduct.cs - Represents the many-to-many relationship between invoices and products, including properties for quantity and price, and validation attributes for these fields
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 namespace InvoiceTracker

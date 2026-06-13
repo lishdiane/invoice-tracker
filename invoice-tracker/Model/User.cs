@@ -1,3 +1,4 @@
+// User.cs - Represents a user in the invoice tracking system, including properties for account and company information, as well as relationships to products, clients, and invoices
 using System.ComponentModel.DataAnnotations;
 
 namespace InvoiceTracker

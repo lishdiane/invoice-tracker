@@ -1,3 +1,4 @@
+// Product.cs - Represents a product in the invoice tracking system, including properties for product details and relationships to users and invoices
 using System.ComponentModel.DataAnnotations;
 
 namespace InvoiceTracker

@@ -1,3 +1,4 @@
+// Invoice.cs - Represents an invoice in the invoice tracking system, including properties for invoice details and relationships to users, clients, and products
 using System.ComponentModel.DataAnnotations;
 
 namespace InvoiceTracker

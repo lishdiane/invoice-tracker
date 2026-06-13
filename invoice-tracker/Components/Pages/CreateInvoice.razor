@@ -1,3 +1,4 @@
+@* Create Invoice Page *@
 @page "/create-invoice"
 @rendermode InteractiveServer
 
@@ -5,15 +6,15 @@
 @inject NavigationManager Navigation
 @inject UserSession UserSession
 
+
 <PageTitle>Create Invoice</PageTitle>
-
-
-
 
 <div class="page-content create-form">
     <h1 class="pb-3">Create Invoice</h1>
     <EditForm EditContext="editContext" OnValidSubmit="SaveInvoice" FormName="create-invoice">
         <DataAnnotationsValidator />
+        
+        @* Client Selection *@
         <div class="mb-3">
             <div>
                 <label for="client" class="form-label">Client</label>
@@ -22,6 +23,7 @@
                              @bind-Value="selectedClientId" @bind-Value:after="OnClientChanged"
                              @onblur="@(() => validator.ValidateField(nameof(createInvoice.ClientId)))">
                     <option value="0">-- Select Client --</option>
+                    @* Client Options *@
                     @foreach (var client in clients)
                     {
                         <option value="@client.ClientId">
@@ -33,6 +35,8 @@
                 <ValidationMessage For="@(() => createInvoice.ClientId)" />
             </div>
         </div>
+
+        @* Product Selection *@
         <div class="mb-3 product-selection">
             <div>
                 <label for="product" class="form-label">Products</label>
@@ -43,6 +47,7 @@
                                      @bind-Value:after="() => SetActiveLine(line.value)">
                             <option value="0">-- Select Product --</option>
 
+                            @* Product Options *@
                             @foreach (var product in products)
                             {
                                 <option value="@product.ProductId">
@@ -51,8 +56,10 @@
                                 </option>
                             }
                         </InputSelect>
-                        <InputNumber class="form-control" @bind-Value="line.value.Quantity" />
-
+                        @* Quantity *@
+                        <InputNumber 
+                            class="form-control"
+                            @bind-Value="line.value.Quantity" />
                         <a>
                             <button type="button" class="btn btn-custom btn-danger"
                                     @onclick="() => RemoveProduct(line.index)">
@@ -68,12 +75,10 @@
                 </a>
                 <button type="button" class="btn btn-custom btn-primary" @onclick="AddProduct">Add Line
                 </button>
-
-                
             </div>
         </div>
-
         
+        @* Invoice Date *@
         <div class="mb-3">
             <label class="form-label">Invoice Date</label>
             <InputDate class="@validator.GetFieldCssClass(nameof(createInvoice.InvoiceDate))"
@@ -82,6 +87,7 @@
             <ValidationMessage For="@(() => createInvoice.InvoiceDate)" />
         </div>
 
+        @* Due Date *@
         <div class="mb-3">
             <label class="form-label">Due Date</label>
             <InputDate class="@validator.GetFieldCssClass(nameof(createInvoice.DueDate))"
@@ -89,121 +95,158 @@
                        @onblur="@(_ => validator.ValidateField(nameof(createInvoice.DueDate)))" />
             <ValidationMessage For="@(() => createInvoice.DueDate)" />
         </div>
+
+        @* Invoice Total *@
         <div class="invoice-total">
             <p><strong>Invoice Total: </strong> @GetInvoiceTotal.ToString("C", new
                                                                 System.Globalization.CultureInfo("en-US"))</p>
+        </div>
+
+        @* Action Buttons *@
+        <div class="centered">
+            <button type="submit" class="btn btn-success" disabled="@(!isFormValid)">
+                Save Invoice
+            </button>
+
+            <button type="button" class="btn btn-custom ms-2" @onclick="Cancel">
+                Cancel
+            </button>
+        </div>
+        
+        <ValidationSummary />
+    </EditForm>
+
+  @* Product Modal to create a new product *@
+    @if (showProductModal)
+    {
+        <div class="modal-backdrop-custom">
+            <div class="custom-modal">
+
+                <h4>Add Product</h4>
+
+                @* Display product creation error message *@
+                @if (!string.IsNullOrWhiteSpace(productError))
+                {
+                    <div class="alert alert-danger">
+                        @productError
+                    </div>
+                }
+
+                @* Product Name *@
+                <div class="mb-3">
+                    <label>Product Name</label>
+
+                    <InputText
+                        class="form-control"
+                        @bind-Value="newProduct.ProductName" />
+                </div>
+
+                @* Product Price *@
+                <div class="mb-3">
+                    <label>Price</label>
+
+                    <InputNumber
+                        class="form-control"
+                        @bind-Value="newProduct.ProductPrice" />
+                </div>
+
+                @* Action Buttons *@
+                <div class="modal-buttons">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        @onclick="CloseProductModal">
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        @onclick="SaveNewProduct">
+                        Save Product
+                    </button>
+                </div>
+                
             </div>
-            <div class="centered">
-                <button type="submit" class="btn btn-success" disabled="@(!isFormValid)">
-                    Save Invoice
-                </button>
+        </div>
+    }
 
-                <button type="button" class="btn btn-custom ms-2" @onclick="Cancel">
-                    Cancel
-                </button>
-            </div>
+    @* Client Modal to create a new client *@
+    @if (showClientModal)
+    {
+        <div class="modal-backdrop-custom">
+            <div class="custom-modal">
 
-            <ValidationSummary />
-        </EditForm>
-        @if (showProductModal)
-        {
-            <div class="modal-backdrop-custom">
-                <div class="custom-modal">
+                <h4>Add Client</h4>
 
-                    <h4>Add Product</h4>
+                @* Client Name *@
+                <div class="mb-3">
+                    <label>Client Name</label>
+                    <InputText 
+                        class="form-control"
+                    @bind-Value="newClient.ClientName" />
+                </div>
 
-                    @if (!string.IsNullOrWhiteSpace(productError))
-                    {
-                        <div class="alert alert-danger">
-                            @productError
-                        </div>
-                    }
+                @* Client Email *@
+                <div class="mb-3">
+                    <label>Email</label>
+                    <InputText 
+                        class="form-control"
+                    @bind-Value="newClient.ClientEmail" />
+                </div>
 
-                    <div class="mb-3">
-                        <label>Product Name</label>
+                @* Client Phone *@
+                <div class="mb-3">
+                    <label>Phone</label>
+                    <InputText 
+                        class="form-control"
+                    @bind-Value="newClient.ClientPhone" />
+                </div>
 
-                        <InputText class="form-control" @bind-Value="newProduct.ProductName" />
+                <hr />
+
+                @* Client Address *@
+                <h6>Address</h6>
+
+                <div class="mb-3">
+                    <label>Street</label>
+                    <InputText 
+                        class="form-control"
+                        @bind-Value="newClient.ClientAddress" />
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>City</label>
+                        <InputText 
+                            class="form-control"
+                            @bind-Value="newClient.ClientCity" />
                     </div>
 
-                    <div class="mb-3">
-                        <label>Price</label>
-
-                        <InputNumber class="form-control" @bind-Value="newProduct.ProductPrice" />
+                    <div class="col">
+                        <label>State</label>
+                        <InputText 
+                            class="form-control"
+                        @bind-Value="newClient.ClientState" />
                     </div>
+                </div>
 
-                    <div class="modal-buttons">
-
-                        <button type="button" class="btn btn-secondary" @onclick="CloseProductModal">
-                            Cancel
-                        </button>
-
-                        <button type="button" class="btn btn-primary" @onclick="SaveNewProduct">
-                            Save Product
-                        </button>
-
-                    </div>
-
+                @* Action Buttons *@
+                <div class="modal-buttons mt-3">
+                    <button type="button"
+                            class="btn btn-primary"
+                            @onclick="SaveNewClient">
+                        Save Client
+                    </button>
+                    <button type="button"
+                            class="btn btn-secondary"
+                            @onclick="CloseClientModal">
+                        Cancel
+                    </button>
                 </div>
             </div>
-        }
-        @if (showClientModal)
-        {
-            <div class="modal-backdrop-custom">
-                <div class="custom-modal">
-
-                    <h4>Add Client</h4>
-
-                    <div class="mb-3">
-                        <label>Client Name</label>
-                        <InputText class="form-control" @bind-Value="newClient.ClientName" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Email</label>
-                        <InputText class="form-control" @bind-Value="newClient.ClientEmail" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Phone</label>
-                        <InputText class="form-control" @bind-Value="newClient.ClientPhone" />
-                    </div>
-
-                    <hr />
-
-                    <h6>Address</h6>
-
-                    <div class="mb-3">
-                        <label>Street</label>
-                        <InputText class="form-control" @bind-Value="newClient.ClientAddress" />
-                    </div>
-
-                    <div class="row">
-                        <div class="col">
-                            <label>City</label>
-                            <InputText class="form-control" @bind-Value="newClient.ClientCity" />
-                        </div>
-
-                        <div class="col">
-                            <label>State</label>
-                            <InputText class="form-control" @bind-Value="newClient.ClientState" />
-                        </div>
-                    </div>
-
-                    <div class="modal-buttons mt-3">
-                        <button type="button" class="btn btn-primary" @onclick="SaveNewClient">
-                            Save Client
-                        </button>
-                        <button type="button" class="btn btn-secondary" @onclick="CloseClientModal">
-                            Cancel
-                        </button>
-
-                    
-                    </div>
-
-                </div>
-            </div>
-        }
-    </div>
+        </div>
+    }
+</div>
 
 @code {
 
@@ -213,8 +256,10 @@
     protected CreateInvoiceModel createInvoice = new();
     private CreateInvoiceLine? activeLine;
     private EditContext editContext;
-    private FormValidationHelper validator;
-    private int? selectedClientId;
+    private FormValidationHelper validator;   
+    private int? selectedClientId; 
+
+    // Temporary models for new product and client creation in modals
     private Product newProduct = new()
     {
         ProductName = string.Empty
@@ -225,14 +270,18 @@
         ClientPhone = ""
     };
 
-    private readonly string[] requiredFields =
+    // Required fields for validation
+    private readonly string[] requiredFields = 
         [
             nameof(createInvoice.ClientId),
             nameof(createInvoice.InvoiceDate),
             nameof(createInvoice.DueDate)
         ];
 
-    private bool isFormValid =>
+    // Computed property to determine if the form is valid. 
+    // It checks that there are no validation messages, at least one product line is added, 
+    // and that all product lines have a selected product and quantity greater than zero.
+    private bool isFormValid => 
         !editContext.GetValidationMessages().Any() &&
         createInvoice.Lines.Count > 0 &&
         createInvoice.Lines.All(line => line.ProductId > 0 && line.Quantity > 0);
@@ -241,6 +290,8 @@
     private string productError = "";
     private string clientError = "";
 
+    // On component initialization, check if the user is authenticated.
+    // If not authenticated, redirect to the login page. If authenticated, load the user's clients
     protected override async Task OnInitializedAsync()
     {
         if (!UserSession.IsAuthenticated)
@@ -272,24 +323,34 @@
         createInvoice.DueDate = DateTime.UtcNow.Date.AddDays(30);
     }
 
+    // When the client selection changes, if the user selects the option to add a new client 
+    // (value of -1), show the client creation modal
     private void OnClientChanged()
     {
+        Console.WriteLine(selectedClientId);
         if (selectedClientId == -1)
         {
             showClientModal = true;
         }
-
+        else
+        {
+            createInvoice.ClientId = selectedClientId.Value;
+        }
     }
 
+    // Set the active line when a product is selected, so that if the user creates a new product, 
+    // it can be automatically assigned to the active line
     private void SetActiveLine(CreateInvoiceLine line)
     {
         activeLine = (line);
     }
 
+    // Save the invoice to the database. It first creates the invoice record, 
+    // then creates the associated invoice line records, and finally navigates back to the invoice list page.
     async Task SaveInvoice()
     {
-        try
-        {
+        try {
+        // Assign values from the createInvoice model to the new Invoice entity
             var invoice = new Invoice
             {
                 UserId = UserSession.UserId,
@@ -304,7 +365,8 @@
 
             Context.Invoices.Add(invoice);
             await Context.SaveChangesAsync();
-
+      
+        //Create invoice line records for each line in the createInvoice model
             foreach (var invoiceLine in createInvoice.Lines)
             {
                 var selectedProduct =
@@ -332,10 +394,13 @@
         }
     }
 
+    // Cancel invoice creation and navigate back to the invoice list page
     void Cancel()
     {
         Navigation.NavigateTo("/invoices");
     }
+
+    // Add a new product line to the invoice
     private void AddProduct()
     {
         createInvoice.Lines.Add(new CreateInvoiceLine());
@@ -344,6 +409,7 @@
             new FieldIdentifier(createInvoice, nameof(createInvoice.Lines)));
     }
 
+    // Remove a product line from the invoice.
     private void RemoveProduct(int index)
     {
         if (createInvoice.Lines.Count <= 1)
@@ -356,6 +422,7 @@
             new FieldIdentifier(createInvoice, nameof(createInvoice.Lines)));
     }
 
+    // Show the product creation modal.
     private void ShowProductModal()
     {
         newProduct = new Product()
@@ -366,6 +433,7 @@
         showProductModal = true;
     }
 
+    // Show the client creation modal.
     private void ShowClientModal()
     {
         newClient = new Client()
@@ -381,15 +449,19 @@
         showClientModal = true;
     }
 
+    // Close the client creation modal
     private void CloseClientModal()
     {
         showClientModal = false;
     }
 
+    // Close the product creation modal
     private void CloseProductModal()
     {
         showProductModal = false;
     }
+
+    // Save a new product to the database. It validates the product name and price.
     private async Task SaveNewProduct()
     {
         productError = "";
@@ -426,6 +498,8 @@
             Console.WriteLine($"Error saving product: {ex.Message}");
         }
     }
+
+    // Save a new client to the database. It validates the client name and email.
     private async Task SaveNewClient()
     {
         clientError = "";
@@ -452,11 +526,15 @@
             Console.WriteLine($"Error saving client: {ex.Message}");
         }
     }
+
+    // Calculate the total for a given invoice line by multiplying the quantity by the product price.
     private decimal GetLineTotal(CreateInvoiceLine line)
     {
         var product = products.FirstOrDefault(p => p.ProductId == line.ProductId);
         return line.Quantity * (product?.ProductPrice ?? 0);
     }
+
+    // Calculate the total for the entire invoice by summing the totals of each line.
     private decimal GetInvoiceTotal =>
         createInvoice.Lines.Sum(line =>
         {

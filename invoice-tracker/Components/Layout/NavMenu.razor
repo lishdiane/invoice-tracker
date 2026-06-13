@@ -1,4 +1,5 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@* Navigation Menu *@
+<div class="top-row ps-3 navbar navbar-dark">
     <a href="/" class="navbar-brand" >
         <div style="display:flex; align-items:center;">
             <img src="/invoice-dollar-svgrepo-com.svg"
@@ -12,30 +13,34 @@
     </a >
 </div>
 
+@* Navigation toggle *@
 <input aria-label="Navigation menu" type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
+@* Navigation items *@
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()"
      onkeydown="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
 
+        @* Dashboard *@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="dashboard">
                 <span class="bi bi-bar-chart" aria-hidden="true"></span> Dashboard
             </NavLink>
         </div>
 
+        @* Invoices *@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="invoices">
                 <span class="bi bi-receipt" aria-hidden="true"></span> Invoices
             </NavLink>
         </div>
-
+        
+        @* Create Invoice *@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="create-invoice">
                 <span class="bi bi-file-earmark-plus" aria-hidden="true"></span> Create Invoice
             </NavLink>
         </div>
-
     </nav>
 </div>
 
